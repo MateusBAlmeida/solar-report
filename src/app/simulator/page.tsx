@@ -1,12 +1,17 @@
+import { SimulationForm }
+from '@/components/forms/SimulationForm'
+
 export default function SimulatorPage() {
   return (
-    <main className="min-h-screen p-8 bg-slate-100">
-      <h1 className="text-3xl font-bold mb-8">
-        Nova Simulação
-      </h1>
+    <main className="min-h-screen bg-slate-100 p-8">
 
-      <div className="bg-white rounded-2xl p-6 shadow">
-        formulário aqui
+      <div className="max-w-7xl mx-auto">
+
+        <h1 className="text-4xl font-bold mb-8">
+          Simulador Fotovoltaico
+        </h1>
+
+        <SimulationForm />
       </div>
     </main>
   )

@@ -11,18 +11,28 @@ export function calculateAverageConsumption(
 
 export function calculateSystemPower(
   averageConsumption: number,
-  irradiation = 5.5,
+  irradiation = 5.152,
   efficiency = 0.8
 ) {
   return (
     averageConsumption /
-    (irradiation * 30 * efficiency)
+    (irradiation * 30.4 * efficiency)
+  )
+}
+
+export function calculateEstimatedGeneration(
+  irradiation = 5.199,
+  efficiency = 0.8
+) {
+
+  return (
+    3.815 * irradiation * 30.4 * efficiency
   )
 }
 
 export function calculatePanels(
   systemPower: number,
-  panelPower = 0.55
+  panelPower = 0.545
 ) {
   return Math.ceil(systemPower / panelPower)
 }
@@ -30,7 +40,7 @@ export function calculatePanels(
 export function calculateRoofArea(
   panels: number
 ) {
-  return panels * 2.3
+  return panels * 2.556048
 }
 
 export function calculateMonthlySavings(
