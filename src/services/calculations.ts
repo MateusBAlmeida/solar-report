@@ -21,7 +21,7 @@ export function calculateSystemPower(
 }
 
 export function calculateEstimatedGeneration(
-  irradiation = 5.199,
+  irradiation = 5.152,
   efficiency = 0.8
 ) {
 
@@ -32,7 +32,7 @@ export function calculateEstimatedGeneration(
 
 export function calculatePanels(
   systemPower: number,
-  panelPower = 0.545
+  panelPower = 0.62
 ) {
   return Math.ceil(systemPower / panelPower)
 }

@@ -86,7 +86,7 @@ export function SimulationResults({
                 <ResultCard
                     title="Quantidade de Placas"
                     value={`${panels}`}
-                    subtitle="Painéis de 545W"
+                    subtitle="Painéis de 620W"
                 />
 
                 <ResultCard
