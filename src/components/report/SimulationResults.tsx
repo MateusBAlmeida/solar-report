@@ -123,7 +123,7 @@ export function SimulationResults({
                             Impacto Ambiental
                         </h3>
 
-                        <div className="space-y-4">
+                        {/* <div className="space-y-4">
 
                             <div>
                                 <p className="text-slate-500 text-sm">
@@ -145,7 +145,7 @@ export function SimulationResults({
                                 </h4>
                             </div>
 
-                        </div>
+                        </div> */}
                     </div>
 
                 </div>
