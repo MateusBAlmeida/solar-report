@@ -33,6 +33,8 @@ import {
     calculateAverageConsumption,
     calculateSystemPower,
     calculateEstimatedGeneration,
+    calculateMonthlyGeneration,
+    calculateAverageGeneration,
     calculatePanels,
     calculateRoofArea,
     calculateMonthlySavings
@@ -41,6 +43,7 @@ import {
 import { SimulationResults }
     from '../report/SimulationResults'
 
+import { solarIrradiationMG } from '@/data/solarIrradiation'
 
 const months = [
     'Jan',
@@ -92,21 +95,27 @@ export function SimulationForm() {
         const roofArea =
             calculateRoofArea(panels)
 
-        const estimatedGeneration =
-            calculateEstimatedGeneration()
-
         const monthlySavings =
             calculateMonthlySavings(
                 averageConsumption,
                 data.tariff
             )
+        const monthlyGeneration =
+            calculateMonthlyGeneration(
+                solarIrradiationMG
+            )
 
+        const estimatedGeneration =
+            calculateAverageGeneration(
+                monthlyGeneration
+            )
         setResults({
             averageConsumption,
             systemPower,
             panels,
             roofArea,
             monthlySavings,
+            monthlyGeneration,
             estimatedGeneration
         })
     }
@@ -118,6 +127,7 @@ export function SimulationForm() {
             panels: number
             roofArea: number
             monthlySavings: number
+            monthlyGeneration: number[]
             estimatedGeneration: number
         }>(null)
 
@@ -292,6 +302,9 @@ export function SimulationForm() {
                                 }
                                 estimatedGeneration={
                                     results.estimatedGeneration
+                                }
+                                monthlyGeneration={
+                                    results.monthlyGeneration
                                 }
                                 customerName={watch('customerName')}
                                 city={watch('city')}

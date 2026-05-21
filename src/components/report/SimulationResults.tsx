@@ -9,6 +9,11 @@ import { FinancialProjection }
 import { DownloadReportButton }
     from '../pdf/DownloadReportButton'
 
+import { useRef, useState } from 'react'
+
+import * as htmlToImage
+    from 'html-to-image'
+
 type Props = {
     averageConsumption: number
     systemPower: number
@@ -20,6 +25,7 @@ type Props = {
     city: string
     state: string
     estimatedGeneration: number
+    monthlyGeneration: number[]
 }
 
 export function SimulationResults({
@@ -32,8 +38,29 @@ export function SimulationResults({
     customerName,
     city,
     state,
-    estimatedGeneration
+    estimatedGeneration,
+    monthlyGeneration
+
 }: Props) {
+    const chartRef =
+        useRef<HTMLDivElement>(null)
+
+    const [chartImage, setChartImage] =
+        useState<string>()
+
+    async function generateChartImage() {
+
+        if (!chartRef.current) return
+
+        const dataUrl =
+            await htmlToImage.toPng(
+                chartRef.current
+            )
+
+        setChartImage(dataUrl)
+
+        return dataUrl
+    }
     return (
         <div className="space-y-6">
 
@@ -42,29 +69,38 @@ export function SimulationResults({
                     Resultado da Simulação
                 </h2>
 
-                <DownloadReportButton
+                <div
+                    onClick={generateChartImage}
+                >
+                    <DownloadReportButton
 
-                    customerName={customerName}
-                    city={city}
-                    state={state}
+                        chartImage={chartImage}
 
-                    averageConsumption={
-                        averageConsumption
-                    }
+                        customerName={customerName}
+                        city={city}
+                        state={state}
 
-                    systemPower={
-                        systemPower
-                    }
+                        averageConsumption={
+                            averageConsumption
+                        }
 
-                    panels={panels}
+                        systemPower={
+                            systemPower
+                        }
 
-                    roofArea={roofArea}
+                        panels={panels}
 
-                    monthlySavings={
-                        monthlySavings
-                    }
-                    estimatedGeneration={estimatedGeneration}
-                />
+                        roofArea={roofArea}
+
+                        monthlySavings={
+                            monthlySavings
+                        }
+
+                        estimatedGeneration={
+                            estimatedGeneration
+                        }
+                    />
+                </div>
 
                 <p className="text-slate-500">
                     Dimensionamento estimado do sistema
@@ -75,12 +111,12 @@ export function SimulationResults({
 
                 <ResultCard
                     title="Consumo Médio"
-                    value={`${averageConsumption.toFixed(0)} kWh`}
+                    value={`${averageConsumption.toFixed(2).replace('.', ',')} kWh`}
                 />
 
                 <ResultCard
                     title="Potência do Sistema"
-                    value={`${systemPower.toFixed(2)} kWp`}
+                    value={`${systemPower.toFixed(2).replace('.', ',')} kWp`}
                 />
 
                 <ResultCard
@@ -96,19 +132,20 @@ export function SimulationResults({
 
                 <ResultCard
                     title="Economia Mensal"
-                    value={`R$ ${monthlySavings.toFixed(2)}`}
+                    value={`R$ ${monthlySavings.toFixed(2).replace('.', ',')}`}
                 />
 
                 <ResultCard
                     title="Geração Estimada"
-                    value={`${estimatedGeneration.toFixed(2)} kWh/mês`}
+                    value={`${estimatedGeneration.toFixed(2).replace('.', ',')} kWh/mês`}
                 />
             </div>
             <div className="grid xl:grid-cols-2 gap-6">
 
                 <ConsumptionChart
+                    ref={chartRef}
                     consumptions={consumptions}
-                    estimatedGeneration={estimatedGeneration}
+                    monthlyGeneration={monthlyGeneration}
                 />
 
                 <div className="space-y-6">
@@ -117,13 +154,13 @@ export function SimulationResults({
                         monthlySavings={monthlySavings}
                     />
 
-                    <div className="bg-white rounded-2xl shadow p-6">
+                    {/* <div className="bg-white rounded-2xl shadow p-6">
 
                         <h3 className="text-xl font-bold mb-4">
                             Impacto Ambiental
                         </h3>
 
-                        {/* <div className="space-y-4">
+                        <div className="space-y-4">
 
                             <div>
                                 <p className="text-slate-500 text-sm">
@@ -145,8 +182,8 @@ export function SimulationResults({
                                 </h4>
                             </div>
 
-                        </div> */}
-                    </div>
+                        </div> 
+                    </div> */}
 
                 </div>
 

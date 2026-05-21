@@ -30,6 +30,37 @@ export function calculateEstimatedGeneration(
   )
 }
 
+export function calculateMonthlyGeneration(
+  irradiationData: number[],
+  efficiency = 0.8
+) {
+
+  return irradiationData.map(
+    irradiation => {
+
+      return (
+        3.815 *
+        irradiation *
+        30 *
+        efficiency
+      )
+    }
+  )
+}
+
+export function calculateAverageGeneration(
+  monthlyGeneration: number[]
+) {
+
+  const total =
+    monthlyGeneration.reduce(
+      (acc, item) => acc + item,
+      0
+    )
+
+  return total / 12
+}
+
 export function calculatePanels(
   systemPower: number,
   panelPower = 0.62

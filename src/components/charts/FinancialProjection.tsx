@@ -35,7 +35,7 @@ export function FinancialProjection({
             </p>
 
             <h4 className="text-3xl font-bold">
-              R$ {monthlySavings.toFixed(2)}
+              R$ {monthlySavings.toFixed(2).replace('.', ',')}
             </h4>
           </div>
 
@@ -45,7 +45,7 @@ export function FinancialProjection({
             </p>
 
             <h4 className="text-3xl font-bold">
-              R$ {yearlySavings.toFixed(2)}
+              R$ {yearlySavings.toFixed(2).replace('.', ',')}
             </h4>
           </div>
 
@@ -55,7 +55,7 @@ export function FinancialProjection({
             </p>
 
             <h4 className="text-3xl font-bold">
-              R$ {savings25Years.toFixed(0)}
+              R$ {savings25Years.toFixed(0).replace('.', ',')}
             </h4>
           </div>
 

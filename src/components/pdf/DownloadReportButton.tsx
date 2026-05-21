@@ -20,6 +20,7 @@ type Props = {
   roofArea: number
   monthlySavings: number
   estimatedGeneration: number
+  chartImage?: string
 }
 
 export function DownloadReportButton(

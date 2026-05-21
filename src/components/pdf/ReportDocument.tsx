@@ -3,7 +3,8 @@ import {
     Page,
     Text,
     View,
-    StyleSheet
+    StyleSheet,
+    Image
 } from '@react-pdf/renderer'
 
 type Props = {
@@ -17,6 +18,7 @@ type Props = {
     roofArea: number
     monthlySavings: number
     estimatedGeneration: number
+    chartImage?: string
 }
 
 const styles = StyleSheet.create({
@@ -82,6 +84,13 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#888',
         fontSize: 10
+    },
+
+    chart: {
+        marginTop: 20,
+        width: '100%',
+        height: 250,
+        objectFit: 'contain'
     }
 })
 
@@ -94,7 +103,8 @@ export function ReportDocument({
     panels,
     roofArea,
     monthlySavings,
-    estimatedGeneration
+    estimatedGeneration,
+    chartImage
 }: Props) {
 
     const yearlySavings =
@@ -223,6 +233,7 @@ export function ReportDocument({
 
                 </View>
 
+                {/* COMPARATIVO ENERGÉTICO */}
                 <View style={styles.section}>
 
                     <Text style={styles.sectionTitle}>
@@ -248,6 +259,25 @@ export function ReportDocument({
                     </Text>
 
                 </View>
+
+                {/* GRÁFICO DE CONSUMO */}
+                {
+                    chartImage && (
+
+                        <View style={styles.section}>
+
+                            <Text style={styles.sectionTitle}>
+                                Consumo x Geração
+                            </Text>
+
+                            <Image
+                                src={chartImage}
+                                style={styles.chart}
+                            />
+
+                        </View>
+                    )
+                }
 
                 {/* RODAPÉ */}
 
