@@ -67,7 +67,7 @@ export function SimulationForm() {
         watch,
         formState: { errors }
     } = useForm<SimulationSchema>({
-        resolver: zodResolver(simulationSchema),
+        resolver: zodResolver(simulationSchema) as any,
 
         defaultValues: {
             consumptions: Array(12).fill(0)
