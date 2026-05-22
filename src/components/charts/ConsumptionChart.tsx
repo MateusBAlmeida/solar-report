@@ -8,7 +8,7 @@ import {
     XAxis,
     YAxis,
     Bar,
-    Line
+    Legend
 } from 'recharts'
 
 import { forwardRef } from 'react'
@@ -57,7 +57,7 @@ export const ConsumptionChart = forwardRef<
     return (
         <div
             ref={ref}
-            className="bg-white rounded-2xl shadow p-6 w-full"
+            className="bg-white rounded-2xl p-6 w-full"
         >
 
             <div className="mb-6">
@@ -90,13 +90,14 @@ export const ConsumptionChart = forwardRef<
                             formatter={(value: any) => `${value.toFixed(2).replace('.', ',')} kWh`}
                             labelFormatter={(label) => `Mês: ${label}`}
                         />
-
+                        <Legend />
                         <Bar
                             dataKey="consumption"
                             radius={[8, 8, 0, 0]}
                             name='Consumo'
+                            fill='#a70000'
                         />
-                        <Line type="monotone" dataKey="generation" name='Geração' />
+                        <Bar radius={[8, 8, 0, 0]} dataKey="generation" name='Geração' fill='#00ac33' />
 
                     </BarChart>
                 </ResponsiveContainer>

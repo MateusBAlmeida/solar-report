@@ -28,6 +28,21 @@ type Props = {
     monthlyGeneration: number[]
 }
 
+const months = [
+    'Jan',
+    'Fev',
+    'Mar',
+    'Abr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Set',
+    'Out',
+    'Nov',
+    'Dez'
+]
+
 export function SimulationResults({
     averageConsumption,
     systemPower,
@@ -57,89 +72,123 @@ export function SimulationResults({
                 chartRef.current
             )
 
-        setChartImage(dataUrl)
-
         return dataUrl
+    }
+    async function handleGeneratePdf() {
+
+        const image =
+            await generateChartImage()
+
+        setChartImage(image)
     }
     return (
         <div className="space-y-6">
 
-            <div>
-                <h2 className="text-3xl font-bold">
-                    Resultado da Simulação
-                </h2>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
 
-                <div
-                    onClick={generateChartImage}
-                >
-                    <DownloadReportButton
+                <div>
+                    <h2 className="text-3xl font-bold">
+                        Resultado da Simulação
+                    </h2>
 
-                        chartImage={chartImage}
-
-                        customerName={customerName}
-                        city={city}
-                        state={state}
-
-                        averageConsumption={
-                            averageConsumption
-                        }
-
-                        systemPower={
-                            systemPower
-                        }
-
-                        panels={panels}
-
-                        roofArea={roofArea}
-
-                        monthlySavings={
-                            monthlySavings
-                        }
-
-                        estimatedGeneration={
-                            estimatedGeneration
-                        }
-                    />
+                    <p className="text-slate-500">
+                        Dimensionamento estimado do sistema
+                    </p>
                 </div>
 
-                <p className="text-slate-500">
-                    Dimensionamento estimado do sistema
-                </p>
+                <DownloadReportButton
+
+                    generateChartImage={
+                        generateChartImage
+                    }
+
+                    customerName={customerName}
+
+                    city={city}
+
+                    state={state}
+
+                    averageConsumption={
+                        averageConsumption
+                    }
+
+                    systemPower={
+                        systemPower
+                    }
+
+                    panels={panels}
+
+                    roofArea={
+                        roofArea
+                    }
+
+                    monthlySavings={
+                        monthlySavings
+                    }
+
+                    estimatedGeneration={
+                        estimatedGeneration
+                    }
+                />
+
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-6">
 
-                <ResultCard
-                    title="Consumo Médio"
-                    value={`${averageConsumption.toFixed(2).replace('.', ',')} kWh`}
-                />
+            <div className="grid xl:grid-cols-2 gap-6 bg-white rounded-2xl shadow p-6 border border-slate-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
 
-                <ResultCard
-                    title="Potência do Sistema"
-                    value={`${systemPower.toFixed(2).replace('.', ',')} kWp`}
-                />
+                    <ResultCard
+                        title="Consumo Médio"
+                        value={`${averageConsumption.toFixed(2).replace('.', ',')} kWh`}
+                    />
 
-                <ResultCard
-                    title="Quantidade de Placas"
-                    value={`${panels}`}
-                    subtitle="Painéis de 620W"
-                />
+                    <ResultCard
+                        title="Potência do Sistema"
+                        value={`${systemPower.toFixed(2).replace('.', ',')} kWp`}
+                    />
 
-                <ResultCard
-                    title="Área Necessária"
-                    value={`${roofArea.toFixed(1)} m²`}
-                />
+                    <ResultCard
+                        title="Quantidade de Placas"
+                        value={`${panels}`}
+                        subtitle="Painéis de 620W"
+                    />
 
-                <ResultCard
-                    title="Economia Mensal"
-                    value={`R$ ${monthlySavings.toFixed(2).replace('.', ',')}`}
-                />
+                    <ResultCard
+                        title="Área Necessária"
+                        value={`${roofArea.toFixed(1)} m²`}
+                    />
 
-                <ResultCard
-                    title="Geração Estimada"
-                    value={`${estimatedGeneration.toFixed(2).replace('.', ',')} kWh/mês`}
-                />
+                    <ResultCard
+                        title="Economia Mensal"
+                        value={`R$ ${monthlySavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                    />
+
+                    <ResultCard
+                        title="Geração Estimada"
+                        value={`${estimatedGeneration.toFixed(2).replace('.', ',')} kWh/mês`}
+                    />
+                </div>
+                <table className="w-full border-collapse border border-slate-200 rounded-lg overflow-hidden bg-white p-6 mb-6 text-center">
+
+                    <thead>
+                        <tr className="bg-green-50">
+                            <th className="border px-4 py-2">Mês</th>
+                            <th className="border px-4 py-2">Consumo (kWh)</th>
+                            <th className="border px-4 py-2">Geração (kWh)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {consumptions.map((consumption, index) => (
+                            <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                <td className="border px-4 py-2">{months[index]}</td>
+                                <td className="border px-4 py-2">{Number(consumption).toFixed(2).replace('.', ',')}</td>
+                                <td className="border px-4 py-2">{Number(monthlyGeneration[index]).toFixed(2).replace('.', ',')}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
+
             <div className="grid xl:grid-cols-2 gap-6">
 
                 <ConsumptionChart
@@ -154,7 +203,7 @@ export function SimulationResults({
                         monthlySavings={monthlySavings}
                     />
 
-                    {/* <div className="bg-white rounded-2xl shadow p-6">
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow p-6">
 
                         <h3 className="text-xl font-bold mb-4">
                             Impacto Ambiental
@@ -182,8 +231,8 @@ export function SimulationResults({
                                 </h4>
                             </div>
 
-                        </div> 
-                    </div> */}
+                        </div>
+                    </div>
 
                 </div>
 

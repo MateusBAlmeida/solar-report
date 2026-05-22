@@ -9,11 +9,11 @@ export function FinancialProjection({
   const yearlySavings =
     monthlySavings * 12
 
-  const savings25Years =
-    yearlySavings * 25
+  const savings5Years =
+    yearlySavings * 5
 
   return (
-    <div className="bg-gradient-to-br from-green-600 to-green-700 text-white rounded-2xl p-8 shadow-lg">
+    <div className="bg-gradient-to-br from-green-600 to-green-700 text-white rounded-2xl p-8 shadow">
 
       <div className="space-y-6">
 
@@ -27,15 +27,15 @@ export function FinancialProjection({
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-5">
 
           <div>
             <p className="text-sm opacity-80">
               Economia Mensal
             </p>
 
-            <h4 className="text-3xl font-bold">
-              R$ {monthlySavings.toFixed(2).replace('.', ',')}
+            <h4 className="text-2xl font-bold">
+              R$ {monthlySavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </h4>
           </div>
 
@@ -44,18 +44,18 @@ export function FinancialProjection({
               Economia Anual
             </p>
 
-            <h4 className="text-3xl font-bold">
-              R$ {yearlySavings.toFixed(2).replace('.', ',')}
+            <h4 className="text-2xl font-bold">
+              R$ {yearlySavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </h4>
           </div>
 
           <div>
             <p className="text-sm opacity-80">
-              Economia em 25 anos
+              Economia em 5 anos
             </p>
 
-            <h4 className="text-3xl font-bold">
-              R$ {savings25Years.toFixed(0).replace('.', ',')}
+            <h4 className="text-2xl font-bold">
+              R$ {savings5Years.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </h4>
           </div>
 

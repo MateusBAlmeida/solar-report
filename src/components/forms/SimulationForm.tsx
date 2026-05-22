@@ -73,7 +73,7 @@ export function SimulationForm() {
         resolver: zodResolver(simulationSchema) as any,
 
         defaultValues: {
-            consumptions: Array(12).fill(0)
+            consumptions: Array(12).fill(undefined)
         }
     })
 
@@ -197,6 +197,8 @@ export function SimulationForm() {
                                         value as 'mono' | 'bi' | 'tri'
                                     )
                                 }
+                                defaultValue="bi"
+                            
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Selecione" />
@@ -207,7 +209,7 @@ export function SimulationForm() {
                                         Monofásico
                                     </SelectItem>
 
-                                    <SelectItem value="bi">
+                                    <SelectItem value="bi" >
                                         Bifásico
                                     </SelectItem>
 
@@ -225,6 +227,7 @@ export function SimulationForm() {
                                 type="number"
                                 step="0.01"
                                 placeholder="0.95"
+                                value="0.95"
                                 {...register('tariff')}
                             />
                         </div>

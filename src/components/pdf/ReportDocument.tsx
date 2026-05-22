@@ -166,7 +166,7 @@ export function ReportDocument({
                             </Text>
 
                             <Text style={styles.cardValue}>
-                                {averageConsumption.toFixed(0)} kWh
+                                {averageConsumption.toFixed(2).replace('.', ',')} kWh
                             </Text>
                         </View>
 
@@ -176,7 +176,7 @@ export function ReportDocument({
                             </Text>
 
                             <Text style={styles.cardValue}>
-                                {systemPower.toFixed(2)} kWp
+                                {systemPower.toFixed(2).replace('.', ',')} kWp
                             </Text>
                         </View>
 
@@ -196,7 +196,7 @@ export function ReportDocument({
                             </Text>
 
                             <Text style={styles.cardValue}>
-                                {roofArea.toFixed(1)} m²
+                                {roofArea.toFixed(1).replace('.', ',')} m²
                             </Text>
                         </View>
 
@@ -206,7 +206,7 @@ export function ReportDocument({
                             </Text>
 
                             <Text style={styles.cardValue}>
-                                {estimatedGeneration.toFixed(2)} kWh/mês
+                                {estimatedGeneration.toFixed(2).replace('.', ',')} kWh/mês
                             </Text>
                         </View>
 
@@ -223,12 +223,12 @@ export function ReportDocument({
 
                     <Text>
                         Economia mensal:
-                        R$ {monthlySavings.toFixed(2)}
+                        R$ {monthlySavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Text>
 
                     <Text>
                         Economia anual:
-                        R$ {yearlySavings.toFixed(2)}
+                        R$ {yearlySavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Text>
 
                 </View>
@@ -242,12 +242,12 @@ export function ReportDocument({
 
                     <Text>
                         Consumo médio atual:
-                        {averageConsumption.toFixed(0)} kWh/mês
+                        {averageConsumption.toFixed(2).replace('.', ',')} kWh/mês
                     </Text>
 
                     <Text>
                         Geração estimada:
-                        {estimatedGeneration.toFixed(0)} kWh/mês
+                        {estimatedGeneration.toFixed(2).replace('.', ',')} kWh/mês
                     </Text>
 
                     <Text>
