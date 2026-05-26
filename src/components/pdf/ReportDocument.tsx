@@ -18,6 +18,7 @@ type Props = {
     roofArea: number
     monthlySavings: number
     estimatedGeneration: number
+    monthlyGeneration: number[]
     chartImage?: string
 }
 
@@ -104,6 +105,7 @@ export function ReportDocument({
     roofArea,
     monthlySavings,
     estimatedGeneration,
+    monthlyGeneration,
     chartImage
 }: Props) {
 
@@ -223,12 +225,12 @@ export function ReportDocument({
 
                     <Text>
                         Economia mensal:
-                        R$ {monthlySavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        R$ {monthlySavings.toLocaleString('pt-BR', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
                     </Text>
 
                     <Text>
                         Economia anual:
-                        R$ {yearlySavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        R$ {yearlySavings.toLocaleString('pt-BR', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
                     </Text>
 
                 </View>
@@ -248,6 +250,11 @@ export function ReportDocument({
                     <Text>
                         Geração estimada:
                         {estimatedGeneration.toFixed(2).replace('.', ',')} kWh/mês
+                    </Text>
+
+                    <Text>
+                        Geração mensal:
+                        {monthlyGeneration.map((value) => value.toFixed(2).replace('.', ',')).join(' / ')}
                     </Text>
 
                     <Text>

@@ -35,7 +35,7 @@ export function FinancialProjection({
             </p>
 
             <h4 className="text-2xl font-bold">
-              R$ {monthlySavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              R$ {monthlySavings.toLocaleString('pt-BR', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
             </h4>
           </div>
 
@@ -45,7 +45,7 @@ export function FinancialProjection({
             </p>
 
             <h4 className="text-2xl font-bold">
-              R$ {yearlySavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              R$ {yearlySavings.toLocaleString('pt-BR', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
             </h4>
           </div>
 
@@ -55,7 +55,7 @@ export function FinancialProjection({
             </p>
 
             <h4 className="text-2xl font-bold">
-              R$ {savings5Years.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              R$ {savings5Years.toLocaleString('pt-BR', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
             </h4>
           </div>
 

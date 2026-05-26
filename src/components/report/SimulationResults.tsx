@@ -9,10 +9,19 @@ import { FinancialProjection }
 import { DownloadReportButton }
     from '../pdf/DownloadReportButton'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 import * as htmlToImage
     from 'html-to-image'
+
+import {
+    calculateSystemPowerByPanels,
+    calculateMonthlyGeneration,
+    calculateEstimatedGeneration,
+    calculateMonthlySavings
+} from '@/services/calculations'
+
+import { solarIrradiationMG } from '@/data/solarIrradiation'
 
 type Props = {
     averageConsumption: number
@@ -26,6 +35,8 @@ type Props = {
     state: string
     estimatedGeneration: number
     monthlyGeneration: number[]
+    installationValue: number
+    paybackTime: number
 }
 
 const months = [
@@ -54,7 +65,9 @@ export function SimulationResults({
     city,
     state,
     estimatedGeneration,
-    monthlyGeneration
+    monthlyGeneration,
+    installationValue,
+    paybackTime
 
 }: Props) {
     const chartRef =
@@ -62,6 +75,18 @@ export function SimulationResults({
 
     const [chartImage, setChartImage] =
         useState<string>()
+
+    const [editablePanels, setEditablePanels] =
+        useState(panels)
+
+    const [recalculatedPower, setRecalculatedPower] =
+        useState(systemPower)
+
+    const [recalculatedGeneration, setRecalculatedGeneration] =
+        useState(estimatedGeneration)
+
+    const [recalculatedSavings, setRecalculatedSavings] =
+        useState(monthlySavings)
 
     async function generateChartImage() {
 
@@ -81,6 +106,42 @@ export function SimulationResults({
 
         setChartImage(image)
     }
+
+    useEffect(() => {
+
+        const newPower =
+            calculateSystemPowerByPanels(
+                editablePanels
+            )
+
+        const monthlyGeneration =
+            calculateMonthlyGeneration(
+                solarIrradiationMG,
+                newPower
+            )
+
+        const averageGeneration =
+            calculateEstimatedGeneration(
+                editablePanels
+            )
+
+        const newSavings =
+            calculateMonthlySavings(
+                averageGeneration,
+                0.95
+            )
+
+        setRecalculatedPower(newPower)
+
+        setRecalculatedGeneration(
+            averageGeneration
+        )
+
+        setRecalculatedSavings(
+            newSavings
+        )
+
+    }, [editablePanels])
     return (
         <div className="space-y-6">
 
@@ -113,7 +174,7 @@ export function SimulationResults({
                     }
 
                     systemPower={
-                        systemPower
+                        recalculatedPower
                     }
 
                     panels={panels}
@@ -123,11 +184,23 @@ export function SimulationResults({
                     }
 
                     monthlySavings={
-                        monthlySavings
+                        recalculatedSavings
                     }
 
                     estimatedGeneration={
-                        estimatedGeneration
+                        recalculatedGeneration
+                    }
+                    monthlyGeneration={
+                        calculateMonthlyGeneration(
+                            solarIrradiationMG,
+                            recalculatedPower
+                        )
+                    }
+                    installationValue={
+                        installationValue
+                    }
+                    paybackTime={
+                        paybackTime
                     }
                 />
 
@@ -144,14 +217,36 @@ export function SimulationResults({
 
                     <ResultCard
                         title="Potência do Sistema"
-                        value={`${systemPower.toFixed(2).replace('.', ',')} kWp`}
+                        value={`${recalculatedPower.toFixed(2).replace('.', ',')} kWp`}
                     />
 
-                    <ResultCard
-                        title="Quantidade de Placas"
-                        value={`${panels}`}
-                        subtitle="Painéis de 620W"
-                    />
+                    <div className="bg-white rounded-2xl shadow p-6 border border-slate-200">
+
+                        <p className="text-slate-500 text-sm">
+                            Quantidade de Placas
+                        </p>
+
+                        <input
+                            type="number"
+
+                            min={1}
+
+                            value={editablePanels}
+
+                            onChange={(e) =>
+                                setEditablePanels(
+                                    Number(e.target.value)
+                                )
+                            }
+
+                            className="mt-3 w-full border rounded-xl px-4 py-3 text-3xl font-bold outline-none"
+                        />
+
+                        <p className="text-sm text-slate-400 mt-2">
+                            Painéis de 620W
+                        </p>
+
+                    </div>
 
                     <ResultCard
                         title="Área Necessária"
@@ -160,12 +255,42 @@ export function SimulationResults({
 
                     <ResultCard
                         title="Economia Mensal"
-                        value={`R$ ${monthlySavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                        value={`R$ ${recalculatedSavings.toLocaleString('pt-BR', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`}
                     />
 
-                    <ResultCard
+                    {/* <ResultCard
                         title="Geração Estimada"
-                        value={`${estimatedGeneration.toFixed(2).replace('.', ',')} kWh/mês`}
+                        value={`${recalculatedGeneration.toFixed(2).replace('.', ',')} kWh/mês`}
+                    /> */}
+
+                    <div className="bg-white rounded-2xl shadow p-6 border border-slate-200">
+
+                        <p className="text-slate-500 text-sm">
+                            Geração Estimada
+                        </p>
+
+                        {
+
+                            recalculatedGeneration > averageConsumption ? (
+
+                                <h4 className="text-2xl font-bold mt-3">
+                                    {recalculatedGeneration.toFixed(2).replace('.', ',')} kWh/mês
+                                </h4>
+
+                            ) : (
+
+                                <h4 className="text-2xl font-bold mt-3 text-red-600">
+                                    {recalculatedGeneration.toFixed(2).replace('.', ',')} kWh/mês
+                                </h4> 
+                            )
+
+                        }
+
+                    </div>
+
+                    <ResultCard
+                        title="Tempo de Retorno da Investimento"
+                        value={`${paybackTime.toFixed(1)} meses`}
                     />
                 </div>
                 <table className="w-full border-collapse border border-slate-200 rounded-lg overflow-hidden bg-white p-6 mb-6 text-center">
@@ -182,7 +307,7 @@ export function SimulationResults({
                             <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                                 <td className="border px-4 py-2">{months[index]}</td>
                                 <td className="border px-4 py-2">{Number(consumption).toFixed(2).replace('.', ',')}</td>
-                                <td className="border px-4 py-2">{Number(monthlyGeneration[index]).toFixed(2).replace('.', ',')}</td>
+                                <td className="border px-4 py-2">{Number(calculateMonthlyGeneration(solarIrradiationMG, recalculatedPower)[index]).toFixed(2).replace('.', ',')}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -194,13 +319,16 @@ export function SimulationResults({
                 <ConsumptionChart
                     ref={chartRef}
                     consumptions={consumptions}
-                    monthlyGeneration={monthlyGeneration}
+                    monthlyGeneration={calculateMonthlyGeneration(
+                        solarIrradiationMG,
+                        recalculatedPower
+                    )}
                 />
 
                 <div className="space-y-6">
 
                     <FinancialProjection
-                        monthlySavings={monthlySavings}
+                        monthlySavings={recalculatedSavings}
                     />
 
                     <div className="bg-white rounded-2xl border border-slate-200 shadow p-6">

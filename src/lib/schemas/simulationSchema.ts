@@ -15,7 +15,9 @@ export const simulationSchema = z.object({
 
   consumptions: z
     .array(z.coerce.number().positive())
-    .length(12)
+    .length(12),
+
+  installationValue: z.coerce.number().positive()
 })
 
 export type SimulationSchema =

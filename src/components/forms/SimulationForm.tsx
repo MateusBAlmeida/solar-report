@@ -37,7 +37,8 @@ import {
     calculateAverageGeneration,
     calculatePanels,
     calculateRoofArea,
-    calculateMonthlySavings
+    calculateMonthlySavings,
+    calculatePaybackTime
 } from '@/services/calculations'
 
 import { SimulationResults }
@@ -102,13 +103,22 @@ export function SimulationForm() {
             )
         const monthlyGeneration =
             calculateMonthlyGeneration(
-                solarIrradiationMG
+                solarIrradiationMG,
+                systemPower
             )
 
         const estimatedGeneration =
-            calculateAverageGeneration(
-                monthlyGeneration
+            calculateEstimatedGeneration(
+                panels,
             )
+
+        const paybackTime =
+            calculatePaybackTime(
+                data.installationValue,
+                monthlySavings
+            )
+
+        const installationValue = panels * data.installationValue
         setResults({
             averageConsumption,
             systemPower,
@@ -116,7 +126,9 @@ export function SimulationForm() {
             roofArea,
             monthlySavings,
             monthlyGeneration,
-            estimatedGeneration
+            estimatedGeneration,
+            installationValue,
+            paybackTime
         })
     }
 
@@ -129,6 +141,8 @@ export function SimulationForm() {
             monthlySavings: number
             monthlyGeneration: number[]
             estimatedGeneration: number
+            installationValue: number
+            paybackTime: number
         }>(null)
 
     return (
@@ -231,6 +245,18 @@ export function SimulationForm() {
                                 {...register('tariff')}
                             />
                         </div>
+
+                        <div className="space-y-2">
+                            <Label>Valor da Instalação (R$)</Label>
+
+                            <Input
+                                type="number"
+                                step="0.01"
+                                placeholder="0,00"
+                                {...register('installationValue')}
+                            />
+                        </div>
+
                     </div>
 
                     {/* CONSUMO */}
@@ -312,6 +338,12 @@ export function SimulationForm() {
                                 customerName={watch('customerName')}
                                 city={watch('city')}
                                 state={watch('state')}
+                                installationValue={
+                                    results.installationValue
+                                }
+                                paybackTime={
+                                    results.paybackTime
+                                }
                             />
                         </div>
                     )

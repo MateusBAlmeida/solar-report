@@ -21,17 +21,19 @@ export function calculateSystemPower(
 }
 
 export function calculateEstimatedGeneration(
+  panels: number,
   irradiation = 5.152,
   efficiency = 0.8
 ) {
 
   return (
-    3.815 * irradiation * 30.4 * efficiency
+    panels * 0.62 * irradiation * 30.4 * efficiency
   )
 }
 
 export function calculateMonthlyGeneration(
   irradiationData: number[],
+  systemPower: number,
   efficiency = 0.8
 ) {
 
@@ -39,7 +41,7 @@ export function calculateMonthlyGeneration(
     irradiation => {
 
       return (
-        3.815 *
+        systemPower *
         irradiation *
         30 *
         efficiency
@@ -79,4 +81,18 @@ export function calculateMonthlySavings(
   tariff: number
 ) {
   return averageConsumption * tariff
+}
+
+export function calculatePaybackTime(
+  installationValue: number,
+  monthlySavings: number
+) {
+  return installationValue / monthlySavings
+}
+
+export function calculateSystemPowerByPanels(
+  panels: number
+) {
+
+  return panels * 0.62
 }
