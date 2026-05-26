@@ -18,7 +18,8 @@ import {
     calculateSystemPowerByPanels,
     calculateMonthlyGeneration,
     calculateEstimatedGeneration,
-    calculateMonthlySavings
+    calculateMonthlySavings,
+    calculateRoofArea
 } from '@/services/calculations'
 
 import { solarIrradiationMG } from '@/data/solarIrradiation'
@@ -88,6 +89,9 @@ export function SimulationResults({
     const [recalculatedSavings, setRecalculatedSavings] =
         useState(monthlySavings)
 
+    const [recalculatedRoofArea, setRecalculatedRoofArea] =
+        useState(roofArea)
+
     async function generateChartImage() {
 
         if (!chartRef.current) return
@@ -131,6 +135,11 @@ export function SimulationResults({
                 0.95
             )
 
+        const newRoofArea =
+            calculateRoofArea(
+                editablePanels
+            )
+
         setRecalculatedPower(newPower)
 
         setRecalculatedGeneration(
@@ -139,6 +148,10 @@ export function SimulationResults({
 
         setRecalculatedSavings(
             newSavings
+        )
+
+        setRecalculatedRoofArea(
+            newRoofArea
         )
 
     }, [editablePanels])
@@ -180,7 +193,7 @@ export function SimulationResults({
                     panels={panels}
 
                     roofArea={
-                        roofArea
+                        recalculatedRoofArea
                     }
 
                     monthlySavings={
@@ -250,7 +263,7 @@ export function SimulationResults({
 
                     <ResultCard
                         title="Área Necessária"
-                        value={`${roofArea.toFixed(1)} m²`}
+                        value={`${recalculatedRoofArea.toFixed(1)} m²`}
                     />
 
                     <ResultCard
@@ -290,7 +303,7 @@ export function SimulationResults({
 
                     <ResultCard
                         title="Tempo de Retorno da Investimento"
-                        value={`${paybackTime.toFixed(1)} meses`}
+                        value={`${Math.floor(paybackTime/12)} anos e ${Math.ceil(paybackTime%12)} meses`}
                     />
                 </div>
                 <table className="w-full border-collapse border border-slate-200 rounded-lg overflow-hidden bg-white p-6 mb-6 text-center">
