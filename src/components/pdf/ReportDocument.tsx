@@ -4,8 +4,9 @@ import {
     Text,
     View,
     StyleSheet,
-    Image
+    Image,
 } from '@react-pdf/renderer'
+
 
 type Props = {
     customerName: string
@@ -19,6 +20,8 @@ type Props = {
     monthlySavings: number
     estimatedGeneration: number
     monthlyGeneration: number[]
+    installationValue: number
+    paybackTime: number
     chartImage?: string
 }
 
@@ -92,7 +95,13 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 250,
         objectFit: 'contain'
-    }
+    },
+
+    table: {
+        width: '100%',
+        borderCollapse: 'collapse',
+        marginTop: 12
+    },
 })
 
 export function ReportDocument({
@@ -106,6 +115,8 @@ export function ReportDocument({
     monthlySavings,
     estimatedGeneration,
     monthlyGeneration,
+    installationValue,
+    paybackTime,
     chartImage
 }: Props) {
 
@@ -212,12 +223,39 @@ export function ReportDocument({
                             </Text>
                         </View>
 
+                        <View style={styles.card}>
+                            <Text style={styles.cardTitle}>
+                                Cobertura Estimada
+                            </Text>
+
+                            <Text style={styles.cardValue}>
+                                {(
+                                    (estimatedGeneration /
+                                        averageConsumption) * 100
+                                ).toFixed(0)}%
+                            </Text>
+                        </View>
+
+                        <View style={styles.card}>
+                            <Text style={styles.cardTitle}>
+                                Tempo de Retorno do Investimento
+                            </Text>
+                            <Text style={styles.cardValue}>
+                                {`${Math.floor(paybackTime / 12)} anos e ${Math.ceil(paybackTime % 12)} meses`}
+                            </Text>
+                        </View>
+
                     </View>
                 </View>
 
                 {/* ECONOMIA */}
 
                 <View style={styles.section}>
+
+                    <Text style={styles.sectionTitle}>
+                        Valor do Investimento:
+                        R$ {installationValue.toLocaleString('pt-BR', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
+                    </Text>
 
                     <Text style={styles.sectionTitle}>
                         Economia Estimada
@@ -253,11 +291,6 @@ export function ReportDocument({
                     </Text>
 
                     <Text>
-                        Geração mensal:
-                        {monthlyGeneration.map((value) => value.toFixed(2).replace('.', ',')).join(' / ')}
-                    </Text>
-
-                    <Text>
                         Cobertura estimada:
                         {(
                             (estimatedGeneration /
@@ -265,6 +298,30 @@ export function ReportDocument({
                         ).toFixed(0)}%
                     </Text>
 
+                </View>
+
+                <View style={styles.table}>
+                    <Text style={{ ...styles.cardTitle, marginBottom: 8 }}>
+                        Geração Mensal Estimada
+                    </Text>
+                    <View style={{ display: 'flex', flexDirection: 'row', borderBottom: '1 solid #DDD' }}>
+                        <Text style={{ width: '50%', padding: 8, borderRight: '1 solid #DDD', fontWeight: 'bold' }}>
+                            Mês
+                        </Text>
+                        <Text style={{ width: '50%', padding: 8, fontWeight: 'bold' }}>
+                            Geração Estimada (kWh)
+                        </Text>
+                    </View>
+                    {monthlyGeneration.map((value, index) => (
+                        <View key={index} style={{ display: 'flex', flexDirection: 'row', borderBottom: '1 solid #EEE' }}>
+                            <Text style={{ width: '50%', padding: 8, borderRight: '1 solid #EEE' }}>
+                                {`Mês ${index + 1}`}
+                            </Text>
+                            <Text style={{ width: '50%', padding: 8 }}>
+                                {value.toFixed(2).replace('.', ',')}
+                            </Text>
+                        </View>
+                    ))}
                 </View>
 
                 {/* GRÁFICO DE CONSUMO */}

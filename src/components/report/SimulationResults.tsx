@@ -190,7 +190,7 @@ export function SimulationResults({
                         recalculatedPower
                     }
 
-                    panels={panels}
+                    panels={editablePanels}
 
                     roofArea={
                         recalculatedRoofArea
