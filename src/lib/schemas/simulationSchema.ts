@@ -6,9 +6,9 @@ export const simulationSchema = z.object({
   state: z.string().min(2),
 
   connectionType: z.enum([
-    'mono',
-    'bi',
-    'tri'
+    'Monofásico',
+    'Bifásico',
+    'Trifásico'
   ]),
 
   tariff: z.coerce.number().positive(),
@@ -17,7 +17,6 @@ export const simulationSchema = z.object({
     .array(z.coerce.number().positive())
     .length(12),
 
-  installationValue: z.coerce.number().positive()
 })
 
 export type SimulationSchema =

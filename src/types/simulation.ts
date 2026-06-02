@@ -2,7 +2,7 @@ export type SimulationFormData = {
   customerName: string
   city: string
   state: string
-  connectionType: 'mono' | 'bi' | 'tri'
+  connectionType: 'Monofásico' | 'Bifásico' | 'Trifásico'
   tariff: number
   consumptions: number[]
 }

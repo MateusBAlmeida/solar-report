@@ -83,13 +83,6 @@ export function calculateMonthlySavings(
   return averageConsumption * tariff
 }
 
-export function calculatePaybackTime(
-  installationValue: number,
-  monthlySavings: number
-) {
-  return installationValue / monthlySavings
-}
-
 export function calculateSystemPowerByPanels(
   panels: number
 ) {

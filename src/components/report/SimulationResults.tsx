@@ -36,8 +36,6 @@ type Props = {
     state: string
     estimatedGeneration: number
     monthlyGeneration: number[]
-    installationValue: number
-    paybackTime: number
 }
 
 const months = [
@@ -67,8 +65,6 @@ export function SimulationResults({
     state,
     estimatedGeneration,
     monthlyGeneration,
-    installationValue,
-    paybackTime
 
 }: Props) {
     const chartRef =
@@ -209,12 +205,6 @@ export function SimulationResults({
                             recalculatedPower
                         )
                     }
-                    installationValue={
-                        installationValue
-                    }
-                    paybackTime={
-                        paybackTime
-                    }
                 />
 
             </div>
@@ -301,10 +291,6 @@ export function SimulationResults({
 
                     </div>
 
-                    <ResultCard
-                        title="Tempo de Retorno da Investimento"
-                        value={`${Math.floor(paybackTime/12)} anos e ${Math.ceil(paybackTime%12)} meses`}
-                    />
                 </div>
                 <table className="w-full border-collapse border border-slate-200 rounded-lg overflow-hidden bg-white p-6 mb-6 text-center">
 

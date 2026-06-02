@@ -38,7 +38,6 @@ import {
     calculatePanels,
     calculateRoofArea,
     calculateMonthlySavings,
-    calculatePaybackTime
 } from '@/services/calculations'
 
 import { SimulationResults }
@@ -112,13 +111,6 @@ export function SimulationForm() {
                 panels,
             )
 
-        const paybackTime =
-            calculatePaybackTime(
-                data.installationValue,
-                monthlySavings
-            )
-
-        const installationValue = panels * data.installationValue
         setResults({
             averageConsumption,
             systemPower,
@@ -127,8 +119,6 @@ export function SimulationForm() {
             monthlySavings,
             monthlyGeneration,
             estimatedGeneration,
-            installationValue,
-            paybackTime
         })
     }
 
@@ -141,8 +131,6 @@ export function SimulationForm() {
             monthlySavings: number
             monthlyGeneration: number[]
             estimatedGeneration: number
-            installationValue: number
-            paybackTime: number
         }>(null)
 
     return (
@@ -208,10 +196,10 @@ export function SimulationForm() {
                                 onValueChange={(value) =>
                                     setValue(
                                         'connectionType',
-                                        value as 'mono' | 'bi' | 'tri'
+                                        value as 'Monofásico' | 'Bifásico' | 'Trifásico'
                                     )
                                 }
-                                defaultValue="bi"
+                                
                             
                             >
                                 <SelectTrigger>
@@ -219,15 +207,15 @@ export function SimulationForm() {
                                 </SelectTrigger>
 
                                 <SelectContent>
-                                    <SelectItem value="mono">
+                                    <SelectItem value="Monofásico" >
                                         Monofásico
                                     </SelectItem>
 
-                                    <SelectItem value="bi" >
+                                    <SelectItem value="Bifásico" >
                                         Bifásico
                                     </SelectItem>
 
-                                    <SelectItem value="tri">
+                                    <SelectItem value="Trifásico">
                                         Trifásico
                                     </SelectItem>
                                 </SelectContent>
@@ -243,17 +231,6 @@ export function SimulationForm() {
                                 placeholder="0.95"
                                 value="0.95"
                                 {...register('tariff')}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label>Valor da Instalação (R$)</Label>
-
-                            <Input
-                                type="number"
-                                step="0.01"
-                                placeholder="0,00"
-                                {...register('installationValue')}
                             />
                         </div>
 
@@ -338,12 +315,6 @@ export function SimulationForm() {
                                 customerName={watch('customerName')}
                                 city={watch('city')}
                                 state={watch('state')}
-                                installationValue={
-                                    results.installationValue
-                                }
-                                paybackTime={
-                                    results.paybackTime
-                                }
                             />
                         </div>
                     )

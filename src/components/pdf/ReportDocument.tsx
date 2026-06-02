@@ -20,8 +20,6 @@ type Props = {
     monthlySavings: number
     estimatedGeneration: number
     monthlyGeneration: number[]
-    installationValue: number
-    paybackTime: number
     chartImage?: string
 }
 
@@ -115,8 +113,6 @@ export function ReportDocument({
     monthlySavings,
     estimatedGeneration,
     monthlyGeneration,
-    installationValue,
-    paybackTime,
     chartImage
 }: Props) {
 
@@ -236,26 +232,12 @@ export function ReportDocument({
                             </Text>
                         </View>
 
-                        <View style={styles.card}>
-                            <Text style={styles.cardTitle}>
-                                Tempo de Retorno do Investimento
-                            </Text>
-                            <Text style={styles.cardValue}>
-                                {`${Math.floor(paybackTime / 12)} anos e ${Math.ceil(paybackTime % 12)} meses`}
-                            </Text>
-                        </View>
-
                     </View>
                 </View>
 
                 {/* ECONOMIA */}
 
                 <View style={styles.section}>
-
-                    <Text style={styles.sectionTitle}>
-                        Valor do Investimento:
-                        R$ {installationValue.toLocaleString('pt-BR', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
-                    </Text>
 
                     <Text style={styles.sectionTitle}>
                         Economia Estimada
