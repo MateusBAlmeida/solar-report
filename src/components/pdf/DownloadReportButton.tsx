@@ -22,6 +22,12 @@ type Props = {
   estimatedGeneration: number
   monthlyGeneration: number[]
   chartImage?: string
+  kitPrice: number
+  projectPrice: number
+  installationPrice: number
+  totalInvestment: number
+  paybackYears: number
+  annualSavings: number
   generateChartImage:
   () => Promise<string | undefined>
 }

@@ -23,6 +23,9 @@ import {
 } from '@/services/calculations'
 
 import { solarIrradiationMG } from '@/data/solarIrradiation'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Label } from '../ui/label'
+import { Input } from '../ui/input'
 
 type Props = {
     averageConsumption: number
@@ -87,6 +90,20 @@ export function SimulationResults({
 
     const [recalculatedRoofArea, setRecalculatedRoofArea] =
         useState(roofArea)
+
+    const [kitPrice, setKitPrice] = useState(0.00)
+    const [projectPrice, setProjectPrice] = useState(0.00)
+    const [installationPrice, setInstallationPrice] = useState(0.00)
+
+    const totalInvestment =
+        kitPrice + projectPrice + installationPrice
+
+    const annualSavings = recalculatedSavings * 12
+
+    const paybackYears =
+        annualSavings > 0
+            ? totalInvestment / annualSavings
+            : 0
 
     async function generateChartImage() {
 
@@ -166,47 +183,6 @@ export function SimulationResults({
                     </p>
                 </div>
 
-                <DownloadReportButton
-
-                    generateChartImage={
-                        generateChartImage
-                    }
-
-                    customerName={customerName}
-
-                    city={city}
-
-                    state={state}
-
-                    averageConsumption={
-                        averageConsumption
-                    }
-
-                    systemPower={
-                        recalculatedPower
-                    }
-
-                    panels={editablePanels}
-
-                    roofArea={
-                        recalculatedRoofArea
-                    }
-
-                    monthlySavings={
-                        recalculatedSavings
-                    }
-
-                    estimatedGeneration={
-                        recalculatedGeneration
-                    }
-                    monthlyGeneration={
-                        calculateMonthlyGeneration(
-                            solarIrradiationMG,
-                            recalculatedPower
-                        )
-                    }
-                />
-
             </div>
 
 
@@ -284,7 +260,7 @@ export function SimulationResults({
 
                                 <h4 className="text-2xl font-bold mt-3 text-red-600">
                                     {recalculatedGeneration.toFixed(2).replace('.', ',')} kWh/mês
-                                </h4> 
+                                </h4>
                             )
 
                         }
@@ -344,7 +320,7 @@ export function SimulationResults({
                                 </p>
 
                                 <h4 className="text-2xl font-bold">
-                                    {(averageConsumption * 0.084 * 12).toFixed(0)} kg
+                                    {(averageConsumption * 0.084 * 12).toFixed(0)} Kg
                                 </h4>
                             </div>
 
@@ -364,6 +340,151 @@ export function SimulationResults({
                 </div>
 
             </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>
+                        Investimento
+                    </CardTitle>
+                </CardHeader>
+
+                <CardContent className="space-y-6">
+
+                    <div className="space-y-4">
+
+                        <div className="space-y-2">
+                            <Label>Valor do Kit</Label>
+
+                            <Input
+                                type="number"
+                                value={kitPrice}
+                                onSelect={(e) =>
+                                    e.currentTarget.select()
+                                }
+                                onChange={(e) =>
+                                    setKitPrice(
+                                        Number(e.target.value)
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Projeto</Label>
+
+                            <Input 
+                                type="number"
+                                value={projectPrice}
+                                onSelect={(e) =>
+                                    e.currentTarget.select()
+                                }
+                                onChange={(e) =>
+                                    setProjectPrice(
+                                        Number(e.target.value)
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Instalação</Label>
+
+                            <Input
+                                type="number"
+                                value={installationPrice}
+                                onSelect={(e) =>
+                                    e.currentTarget.select()
+                                }
+                                onChange={(e) =>
+                                    setInstallationPrice(
+                                        Number(e.target.value)
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+
+                            <h3 className="font-bold text-xl">
+                                Investimento Total
+                            </h3>
+
+                            <p>
+                                {new Intl.NumberFormat(
+                                    'pt-BR',
+                                    {
+                                        style: 'currency',
+                                        currency: 'BRL'
+                                    }
+                                ).format(totalInvestment)}
+                            </p>
+
+                        </div>
+
+                        <div>
+
+                            <h3 className="font-bold">
+                                Payback
+                            </h3>
+
+                            <p>
+                                {paybackYears.toFixed(1)} anos
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <DownloadReportButton
+
+                    generateChartImage={
+                        generateChartImage
+                    }
+
+                    customerName={customerName}
+
+                    city={city}
+
+                    state={state}
+
+                    averageConsumption={
+                        averageConsumption
+                    }
+
+                    systemPower={
+                        recalculatedPower
+                    }
+
+                    panels={editablePanels}
+
+                    roofArea={
+                        recalculatedRoofArea
+                    }
+
+                    monthlySavings={
+                        recalculatedSavings
+                    }
+
+                    estimatedGeneration={
+                        recalculatedGeneration
+                    }
+                    monthlyGeneration={
+                        calculateMonthlyGeneration(
+                            solarIrradiationMG,
+                            recalculatedPower
+                        )
+                    }
+                    kitPrice={kitPrice}
+                    projectPrice={projectPrice}
+                    installationPrice={installationPrice}
+                    totalInvestment={totalInvestment}
+                    paybackYears={paybackYears}
+                    annualSavings={annualSavings}
+                />
+
+                </CardContent>
+
+            </Card>
         </div>
     )
 }
