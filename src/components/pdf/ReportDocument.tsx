@@ -31,6 +31,8 @@ type Props = {
     totalInvestment: number
     paybackYears: number
     annualSavings: number
+    descriptionPlacas: string
+    descriptionInversor: string
 }
 
 const styles = StyleSheet.create({
@@ -148,7 +150,9 @@ export function ReportDocument({
     installationPrice,
     totalInvestment,
     paybackYears,
-    annualSavings
+    annualSavings,
+    descriptionPlacas,
+    descriptionInversor
 }: Props) {
 
     const yearlySavings =
@@ -323,7 +327,7 @@ export function ReportDocument({
                             Placa Solar
                         </Text>
                         <Text style={{ width: '50%', padding: 8 }}>
-                            620W mono half-cell 1500Vc
+                            {descriptionPlacas}
                         </Text>
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'row', borderBottom: '1 solid #EEE' }}>
@@ -334,7 +338,7 @@ export function ReportDocument({
                             Inversor On-Grid
                         </Text>
                         <Text style={{ width: '50%', padding: 8 }}>
-                            3kW/200V WiFi
+                            {descriptionInversor}
                         </Text>
                     </View>
 

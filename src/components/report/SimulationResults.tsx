@@ -95,6 +95,9 @@ export function SimulationResults({
     const [projectPrice, setProjectPrice] = useState(0.00)
     const [installationPrice, setInstallationPrice] = useState(0.00)
 
+    const [descriptionPlacas, setDescriptionPlacas] = useState('')
+    const [descriptionInversor, setDescriptionInversor] = useState('')
+
     const totalInvestment =
         kitPrice + projectPrice + installationPrice
 
@@ -433,6 +436,30 @@ export function SimulationResults({
 
                         </div>
 
+                        <div>
+                            <h3 className="font-bold">
+                                Descrição dos Equipamentos
+                            </h3>
+
+                            <Input
+                                type="text"
+                                placeholder="Descrição das placas"
+                                onChange={(e) => {
+                                    setDescriptionPlacas(e.target.value)
+                                }}
+                                className='space-y-2 mt-2'
+                            />
+
+                            <Input
+                                type="text"
+                                placeholder="Descrição do inversor"
+                                onChange={(e) => {
+                                    setDescriptionInversor(e.target.value)
+                                }}
+                                className='space-y-2 mt-2'
+                            />
+                        </div>
+
                     </div>
 
                     <DownloadReportButton
@@ -480,6 +507,8 @@ export function SimulationResults({
                     totalInvestment={totalInvestment}
                     paybackYears={paybackYears}
                     annualSavings={annualSavings}
+                    descriptionPlacas={descriptionPlacas}
+                    descriptionInversor={descriptionInversor}
                 />
 
                 </CardContent>

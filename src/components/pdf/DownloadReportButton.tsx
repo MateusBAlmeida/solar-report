@@ -28,6 +28,8 @@ type Props = {
   totalInvestment: number
   paybackYears: number
   annualSavings: number
+  descriptionPlacas: string
+  descriptionInversor: string
   generateChartImage:
   () => Promise<string | undefined>
 }
