@@ -32,6 +32,7 @@ type Props = {
     annualSavings: number
     descriptionPlacas: string
     descriptionInversor: string
+    inversor: string
 }
 
 const styles = StyleSheet.create({
@@ -145,7 +146,6 @@ export function ReportDocument({
     monthlyGeneration,
     chartImage,
     kitPrice,
-    projectPrice,
     installationPrice,
     totalInvestment,
     paybackYears,
