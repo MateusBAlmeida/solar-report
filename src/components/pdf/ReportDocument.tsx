@@ -293,7 +293,6 @@ export function ReportDocument({
                 </View>
 
             </Page>
-<<<<<<< HEAD
             <Page size="A4" style={styles.page}>
 
                 <Text style={styles.subtitle}>
@@ -397,8 +396,6 @@ export function ReportDocument({
                 </View>
 
             </Page>
-=======
->>>>>>> 9818c51d46c7fc45fcc89dd396f511278d30e7eb
 
             <Page size="A4" style={styles.page}>
 
