@@ -59,7 +59,7 @@ export function DownloadReportButton(
     link.href = url
 
     link.download =
-      'relatorio-fotovoltaico.pdf'
+      'relatorio-'+ props.customerName + '.pdf'
 
     link.click()
 
