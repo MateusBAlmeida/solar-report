@@ -26,11 +26,13 @@ type Props = {
     monthlyGeneration: number[]
     chartImage?: string
     kitPrice: number
-    projectPrice: number
     installationPrice: number
     totalInvestment: number
     paybackYears: number
     annualSavings: number
+    descriptionPlacas: string
+    descriptionInversor: string
+    inversor: string
 }
 
 const styles = StyleSheet.create({
@@ -144,11 +146,13 @@ export function ReportDocument({
     monthlyGeneration,
     chartImage,
     kitPrice,
-    projectPrice,
     installationPrice,
     totalInvestment,
     paybackYears,
-    annualSavings
+    annualSavings,
+    descriptionPlacas,
+    descriptionInversor,
+    inversor
 }: Props) {
 
     const yearlySavings =
@@ -289,6 +293,7 @@ export function ReportDocument({
                 </View>
 
             </Page>
+<<<<<<< HEAD
             <Page size="A4" style={styles.page}>
 
                 <Text style={styles.subtitle}>
@@ -392,6 +397,8 @@ export function ReportDocument({
                 </View>
 
             </Page>
+=======
+>>>>>>> 9818c51d46c7fc45fcc89dd396f511278d30e7eb
 
             <Page size="A4" style={styles.page}>
 
@@ -420,18 +427,7 @@ export function ReportDocument({
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'row', borderBottom: '1 solid #EEE' }}>
                         <Text style={{ width: '50%', padding: 8, borderRight: '1 solid #EEE' }}>
-                            Projeto
-                        </Text>
-                        <Text style={{ width: '50%', padding: 8, borderRight: '1 solid #EEE' }}>
-                            {`R$ ${projectPrice.toLocaleString('pt-BR', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            })}`}
-                        </Text>
-                    </View>
-                    <View style={{ display: 'flex', flexDirection: 'row', borderBottom: '1 solid #EEE' }}>
-                        <Text style={{ width: '50%', padding: 8, borderRight: '1 solid #EEE' }}>
-                            Instalação
+                            Projeto e Instalação
                         </Text>
                         <Text style={{ width: '50%', padding: 8, borderRight: '1 solid #EEE' }}>
                             {`R$ ${installationPrice.toLocaleString('pt-BR', {
@@ -523,6 +519,112 @@ export function ReportDocument({
                         (37) 9 9779-5059
                     </Text>
                 </View>
+            </Page>
+
+            <Page size="A4" style={styles.page}>
+
+                <Text style={styles.subtitle}>
+                    KIT
+                </Text>
+
+                <Text style={styles.text}>
+                    Baseado no consumo, para que o tenha condição da usina gerar energia
+                    suficiente para equiparar os gastos de energia fornecido pela CEMIG, será
+                    necessário os seguintes equipamentos e quantidades: </Text>
+
+                <View style={styles.table}>
+                    <Text style={{ ...styles.cardTitle, marginBottom: 8 }}>
+                        COMPONENTES
+                    </Text>
+                    <View style={{ display: 'flex', flexDirection: 'row', borderBottom: '1 solid #DDD' }}>
+                        <Text style={{ width: '50%', fontWeight: 'bold', padding: 8, borderRight: '1 solid #DDD' }}>
+                            Quantidade
+                        </Text>
+                        <Text style={{ width: '50%', fontWeight: 'bold', padding: 8 }}>
+                            Item
+                        </Text>
+                        <Text style={{ width: '50%', fontWeight: 'bold', padding: 8 }}>
+                            Especificação
+                        </Text>
+                    </View>
+                    <View style={{ display: 'flex', flexDirection: 'row', borderBottom: '1 solid #EEE' }}>
+                        <Text style={{ width: '50%', padding: 8, borderRight: '1 solid #EEE' }}>
+                            {panels}
+                        </Text>
+                        <Text style={{ width: '50%', padding: 8, borderRight: '1 solid #EEE' }}>
+                            Placa Solar
+                        </Text>
+                        <Text style={{ width: '50%', padding: 8 }}>
+                            {descriptionPlacas}
+                        </Text>
+                    </View>
+                    <View style={{ display: 'flex', flexDirection: 'row', borderBottom: '1 solid #EEE' }}>
+                        <Text style={{ width: '50%', padding: 8, borderRight: '1 solid #EEE' }}>
+                            {
+                                inversor==="Microinversor" ? Math.ceil(panels/4) : 1
+                            }
+                        </Text>
+                        <Text style={{ width: '50%', padding: 8, borderRight: '1 solid #EEE' }}>
+                            {inversor}
+                        </Text>
+                        <Text style={{ width: '50%', padding: 8 }}>
+                            {descriptionInversor}
+                        </Text>
+                    </View>
+
+                </View>
+
+                <Text style={styles.subtitle}>
+                    ECONOMIA PROJETADA
+                </Text>
+
+                <View style={styles.section}>
+
+                    <Text style={{ marginBottom: 8 }}>
+                        Com base na geração estimada, a economia projetada é a seguinte:
+                    </Text>
+
+                    <Text style={{ marginBottom: 4 }}>
+                        Economia Mensal: R$ {monthlySavings.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}
+                    </Text>
+                    <Text style={{ marginBottom: 4 }}>
+                        Economia Anual: R$ {yearlySavings.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}
+                    </Text>
+                    <Text style={{ marginBottom: 4 }}>
+                        Economia em 5 anos: R$ {fiveYearSavings.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}
+                    </Text>
+                    <Text style={{ marginBottom: 4 }}>
+                        Payback: {paybackYears.toFixed(1)} anos
+                    </Text>
+
+                    <Text style={{ marginBottom: 4 }}>
+                        CO₂ evitado por ano: {(averageConsumption * 0.084 * 12).toFixed(2).replace('.', ',')} Kg
+                    </Text>
+
+                    <Text style={{ marginBottom: 4 }}>
+                        Árvores equivalentes plantadas por ano: {(averageConsumption * 0.02).toFixed(0)}
+                    </Text>
+
+                </View>
+
+                <View style={styles.footer}>
+                    <Text>
+                        Alan Almeida
+                    </Text>
+                    <Text>
+                        (37) 9 9779-5059
+                    </Text>
+                </View>
+
             </Page>
 
             <Page size="A4" style={styles.page}>

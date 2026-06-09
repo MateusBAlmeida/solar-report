@@ -26,6 +26,13 @@ import { solarIrradiationMG } from '@/data/solarIrradiation'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
+import {
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectItem
+} from '../ui/select'
 
 type Props = {
     averageConsumption: number
@@ -92,11 +99,14 @@ export function SimulationResults({
         useState(roofArea)
 
     const [kitPrice, setKitPrice] = useState(0.00)
-    const [projectPrice, setProjectPrice] = useState(0.00)
     const [installationPrice, setInstallationPrice] = useState(0.00)
 
+    const [descriptionPlacas, setDescriptionPlacas] = useState('')
+    const [descriptionInversor, setDescriptionInversor] = useState('')
+    const [inversor, setInversor] = useState('')
+
     const totalInvestment =
-        kitPrice + projectPrice + installationPrice
+        kitPrice + installationPrice
 
     const annualSavings = recalculatedSavings * 12
 
@@ -370,24 +380,7 @@ export function SimulationResults({
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Projeto</Label>
-
-                            <Input 
-                                type="number"
-                                value={projectPrice}
-                                onSelect={(e) =>
-                                    e.currentTarget.select()
-                                }
-                                onChange={(e) =>
-                                    setProjectPrice(
-                                        Number(e.target.value)
-                                    )
-                                }
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label>Instalação</Label>
+                            <Label>Projeto e Instalação</Label>
 
                             <Input
                                 type="number"
@@ -433,54 +426,102 @@ export function SimulationResults({
 
                         </div>
 
+                        <div>
+                            <h3 className="font-bold">
+                                Descrição dos Equipamentos
+                            </h3>
+
+                            <Input
+                                type="text"
+                                placeholder="Descrição das placas"
+                                onChange={(e) => {
+                                    setDescriptionPlacas(e.target.value)
+                                }}
+                                className='space-y-2 mt-2'
+                            />
+
+                            <div className='space-y-2 mt-4 font-bold'>
+                            <Select 
+                                onValueChange={(value) => {
+                                    setInversor(
+                                        value as string
+                                        )
+                                }}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Selecione um modelo de inversor" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Inversor">
+                                        Inversor
+                                    </SelectItem>
+                                    <SelectItem value="Microinversor">
+                                        Microinversor
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                            </div>
+
+                            <Input
+                                type="text"
+                                placeholder={`Descrição do ${inversor}`}
+                                onChange={(e) => {
+                                    setDescriptionInversor(e.target.value)
+                                }}
+                                className='space-y-2 mt-2'
+                            />
+                        </div>
+
                     </div>
 
                     <DownloadReportButton
 
-                    generateChartImage={
-                        generateChartImage
-                    }
+                        generateChartImage={
+                            generateChartImage
+                        }
 
-                    customerName={customerName}
+                        customerName={customerName}
 
-                    city={city}
+                        city={city}
 
-                    state={state}
+                        state={state}
 
-                    averageConsumption={
-                        averageConsumption
-                    }
+                        averageConsumption={
+                            averageConsumption
+                        }
 
-                    systemPower={
-                        recalculatedPower
-                    }
-
-                    panels={editablePanels}
-
-                    roofArea={
-                        recalculatedRoofArea
-                    }
-
-                    monthlySavings={
-                        recalculatedSavings
-                    }
-
-                    estimatedGeneration={
-                        recalculatedGeneration
-                    }
-                    monthlyGeneration={
-                        calculateMonthlyGeneration(
-                            solarIrradiationMG,
+                        systemPower={
                             recalculatedPower
-                        )
-                    }
-                    kitPrice={kitPrice}
-                    projectPrice={projectPrice}
-                    installationPrice={installationPrice}
-                    totalInvestment={totalInvestment}
-                    paybackYears={paybackYears}
-                    annualSavings={annualSavings}
-                />
+                        }
+
+                        panels={editablePanels}
+
+                        roofArea={
+                            recalculatedRoofArea
+                        }
+
+                        monthlySavings={
+                            recalculatedSavings
+                        }
+
+                        estimatedGeneration={
+                            recalculatedGeneration
+                        }
+                        monthlyGeneration={
+                            calculateMonthlyGeneration(
+                                solarIrradiationMG,
+                                recalculatedPower
+                            )
+                        }
+                        kitPrice={kitPrice}
+                        installationPrice={installationPrice}
+                        totalInvestment={totalInvestment}
+                        paybackYears={paybackYears}
+                        annualSavings={annualSavings}
+                        descriptionPlacas={descriptionPlacas}
+                        descriptionInversor={descriptionInversor}
+                        inversor={inversor}
+                    />
 
                 </CardContent>
 

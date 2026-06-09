@@ -23,11 +23,13 @@ type Props = {
   monthlyGeneration: number[]
   chartImage?: string
   kitPrice: number
-  projectPrice: number
   installationPrice: number
   totalInvestment: number
   paybackYears: number
   annualSavings: number
+  descriptionPlacas: string
+  descriptionInversor: string
+  inversor: string
   generateChartImage:
   () => Promise<string | undefined>
 }
