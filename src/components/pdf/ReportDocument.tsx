@@ -604,7 +604,7 @@ export function ReportDocument({
                     </Text>
 
                     <Text style={{ marginBottom: 4 }}>
-                        CO₂ evitado por ano: {(averageConsumption * 0.084 * 12).toFixed(2).replace('.', ',')} Kg
+                        CO2 evitado por ano: {(averageConsumption * 0.084 * 12).toFixed(2).replace('.', ',')} Kg
                     </Text>
 
                     <Text style={{ marginBottom: 4 }}>
