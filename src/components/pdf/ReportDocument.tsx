@@ -133,6 +133,21 @@ const styles = StyleSheet.create({
     },
 })
 
+const months = [
+    'Jan',
+    'Fev',
+    'Mar',
+    'Abr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Set',
+    'Out',
+    'Nov',
+    'Dez'
+]
+
 export function ReportDocument({
     customerName,
     city,
@@ -263,7 +278,7 @@ export function ReportDocument({
                     {monthlyGeneration.map((value, index) => (
                         <View key={index} style={{ display: 'flex', flexDirection: 'row', borderBottom: '1 solid #EEE' }}>
                             <Text style={{ width: '50%', padding: 3, borderRight: '1 solid #EEE' }}>
-                                {`Mês ${index + 1}`}
+                                {months[index]}
                             </Text>
                             <Text style={{ width: '50%', padding: 3 }}>
                                 {value.toFixed(2).replace('.', ',')}
@@ -479,11 +494,20 @@ export function ReportDocument({
                     </Text>
 
                     <Text style={{ marginBottom: 4 }}>
+                        Potência do Sistema: {systemPower.toFixed(2)} kWp
+                    </Text>
+
+                    <Text style={{ marginBottom: 4 }}>
+                        Geração Estimada : {monthlyGeneration.va} kWh/mês
+                    </Text>
+
+                    <Text style={{ marginBottom: 4 }}>
                         Economia Mensal: R$ {monthlySavings.toLocaleString('pt-BR', {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2
                         })}
                     </Text>
+                    
                     <Text style={{ marginBottom: 4 }}>
                         Economia Anual: R$ {yearlySavings.toLocaleString('pt-BR', {
                             minimumFractionDigits: 2,
