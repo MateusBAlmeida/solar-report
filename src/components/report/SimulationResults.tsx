@@ -23,6 +23,7 @@ import {
 } from '@/services/calculations'
 
 import { solarIrradiationMG } from '@/data/solarIrradiation'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
@@ -46,6 +47,11 @@ type Props = {
     state: string
     estimatedGeneration: number
     monthlyGeneration: number[]
+    connectionType?: string
+    tariff?: number
+    coverage?: number
+    onSaveSimulation?: (payload: Record<string, unknown>) => Promise<void> | void
+    selectedSimulationId?: string | null
 }
 
 const months = [
@@ -75,7 +81,11 @@ export function SimulationResults({
     state,
     estimatedGeneration,
     monthlyGeneration,
-
+    connectionType,
+    tariff,
+    coverage,
+    onSaveSimulation,
+    selectedSimulationId,
 }: Props) {
     const chartRef =
         useRef<HTMLDivElement>(null)
@@ -133,6 +143,43 @@ export function SimulationResults({
 
         setChartImage(image)
     }
+
+    async function handleSaveProposal() {
+        if (!onSaveSimulation) return
+
+        await onSaveSimulation({
+            customerName,
+            city,
+            state,
+            connectionType: connectionType || 'Monofásico',
+            tariff: Number(tariff ?? 0.95),
+            consumptions: consumptions.map((value) => Number(value) || 0),
+            averageConsumption,
+            systemPower: recalculatedPower,
+            panels: editablePanels,
+            roofArea: recalculatedRoofArea,
+            estimatedGeneration: recalculatedGeneration,
+            monthlySavings: recalculatedSavings,
+            coverage: typeof coverage === 'number' ? coverage : Number(((recalculatedGeneration / averageConsumption) * 100).toFixed(2)) || 0,
+            kitPrice,
+            projectPrice: installationPrice,
+            installationPrice,
+            totalInvestment,
+            paybackYears,
+            descriptionPlacas,
+            descriptionInversor,
+            inversor,
+            pdfUrl: null,
+        })
+    }
+
+    useEffect(() => {
+        setEditablePanels(panels)
+        setRecalculatedPower(systemPower)
+        setRecalculatedGeneration(estimatedGeneration)
+        setRecalculatedSavings(monthlySavings)
+        setRecalculatedRoofArea(roofArea)
+    }, [panels, systemPower, estimatedGeneration, monthlySavings, roofArea])
 
     useEffect(() => {
 
@@ -473,6 +520,16 @@ export function SimulationResults({
                         </div>
 
                     </div>
+
+                    {onSaveSimulation && (
+                        <Button
+                            type="button"
+                            onClick={handleSaveProposal}
+                            className="bg-slate-700 hover:bg-slate-800"
+                        >
+                            {selectedSimulationId ? 'Atualizar simulação' : 'Salvar simulação'}
+                        </Button>
+                    )}
 
                     <DownloadReportButton
 

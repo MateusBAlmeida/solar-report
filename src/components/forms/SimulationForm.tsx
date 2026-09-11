@@ -1,6 +1,8 @@
 'use client'
 
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import {
@@ -27,14 +29,11 @@ import {
     SelectValue
 } from '@/components/ui/select'
 
-import { useState } from 'react'
-
 import {
     calculateAverageConsumption,
     calculateSystemPower,
     calculateEstimatedGeneration,
     calculateMonthlyGeneration,
-    calculateAverageGeneration,
     calculatePanels,
     calculateRoofArea,
     calculateMonthlySavings,
@@ -67,15 +66,44 @@ export function SimulationForm() {
         register,
         handleSubmit,
         setValue,
+        reset,
         watch,
         formState: { errors }
     } = useForm<SimulationSchema>({
         resolver: zodResolver(simulationSchema) as any,
-
         defaultValues: {
-            consumptions: Array(12).fill(undefined)
+            consumptions: Array(12).fill(0),
+            tariff: 0.95,
+            connectionType: 'Monofásico',
+            customerName: '',
+            city: '',
+            state: ''
         }
     })
+
+    const searchParams = useSearchParams()
+    const [selectedSimulationId, setSelectedSimulationId] = useState<string | null>(null)
+
+    useEffect(() => {
+        const simulationId = searchParams.get('simulationId')
+
+        if (!simulationId) {
+            return
+        }
+
+        const loadFromUrl = async () => {
+            const response = await fetch(`/api/simulations/${simulationId}`)
+
+            if (!response.ok) {
+                return
+            }
+
+            const data = await response.json()
+            loadSavedSimulation(data.simulation)
+        }
+
+        loadFromUrl().catch(() => undefined)
+    }, [searchParams])
 
     const onSubmit = (data: SimulationSchema) => {
 
@@ -120,6 +148,71 @@ export function SimulationForm() {
             monthlyGeneration,
             estimatedGeneration,
         })
+    }
+
+    const handleSaveSimulation = async (payload: Record<string, unknown>) => {
+        const method = selectedSimulationId ? 'PUT' : 'POST'
+        const url = selectedSimulationId ? `/api/simulations/${selectedSimulationId}` : '/api/simulations'
+
+        const response = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+
+        if (!response.ok) {
+            const errorText = await response.text()
+            throw new Error(errorText || 'Não foi possível salvar a simulação.')
+        }
+
+        const data = await response.json()
+        setSelectedSimulationId(data.simulation?.id ?? selectedSimulationId)
+    }
+
+    const loadSavedSimulation = (simulation: any) => {
+        const client = simulation.client
+        const proposal = simulation.proposal
+
+        const consumptions = Array.isArray(simulation.consumptions)
+            ? simulation.consumptions.map(Number)
+            : Array(12).fill(0)
+
+        reset({
+            customerName: client.name,
+            city: client.city,
+            state: client.state,
+            connectionType: simulation.connectionType ?? 'Monofásico',
+            tariff: Number(simulation.tariff) || 0.95,
+            consumptions,
+        })
+
+        setSelectedSimulationId(simulation.id)
+
+        const averageConsumption = Number(simulation.averageConsumption)
+        const systemPower = Number(simulation.systemPower)
+        const panels = Number(simulation.panels)
+        const roofArea = Number(simulation.roofArea)
+        const monthlySavings = Number(simulation.monthlySavings)
+        const estimatedGeneration = Number(simulation.estimatedGeneration)
+        const monthlyGeneration = Array.isArray(simulation.monthlyGeneration)
+            ? simulation.monthlyGeneration.map(Number)
+            : calculateMonthlyGeneration(solarIrradiationMG, systemPower)
+
+        setResults({
+            averageConsumption,
+            systemPower,
+            panels,
+            roofArea,
+            monthlySavings,
+            monthlyGeneration,
+            estimatedGeneration,
+        })
+
+        if (proposal) {
+            setValue('tariff', Number(simulation.tariff) || 0.95)
+        }
     }
 
     const [results, setResults] =
@@ -193,14 +286,13 @@ export function SimulationForm() {
                             <Label>Tipo de Ligação</Label>
 
                             <Select
+                                value={watch('connectionType')}
                                 onValueChange={(value) =>
                                     setValue(
                                         'connectionType',
                                         value as 'Monofásico' | 'Bifásico' | 'Trifásico'
                                     )
                                 }
-                                
-                            
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Selecione" />
@@ -229,7 +321,7 @@ export function SimulationForm() {
                                 type="number"
                                 step="0.01"
                                 placeholder="0.95"
-                                value="0.95"
+                                value={watch('tariff') ?? 0.95}
                                 {...register('tariff')}
                             />
                         </div>
@@ -315,6 +407,11 @@ export function SimulationForm() {
                                 customerName={watch('customerName')}
                                 city={watch('city')}
                                 state={watch('state')}
+                                onSaveSimulation={handleSaveSimulation}
+                                selectedSimulationId={selectedSimulationId}
+                                connectionType={watch('connectionType')}
+                                tariff={Number(watch('tariff')) || 0.95}
+                                coverage={Number((results.estimatedGeneration / results.averageConsumption * 100).toFixed(2)) || 0}
                             />
                         </div>
                     )
