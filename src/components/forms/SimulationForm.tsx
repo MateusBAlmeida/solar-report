@@ -83,6 +83,8 @@ export function SimulationForm() {
 
     const searchParams = useSearchParams()
     const [selectedSimulationId, setSelectedSimulationId] = useState<string | null>(null)
+    const [clientId, setClientId] = useState<string | null>(null)
+    const [savedProposal, setSavedProposal] = useState<any>(null)
 
     useEffect(() => {
         const simulationId = searchParams.get('simulationId')
@@ -154,12 +156,17 @@ export function SimulationForm() {
         const method = selectedSimulationId ? 'PUT' : 'POST'
         const url = selectedSimulationId ? `/api/simulations/${selectedSimulationId}` : '/api/simulations'
 
+        const requestPayload = {
+            ...payload,
+            clientId: clientId ?? payload.clientId ?? null,
+        }
+
         const response = await fetch(url, {
             method,
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(requestPayload)
         })
 
         if (!response.ok) {
@@ -188,6 +195,8 @@ export function SimulationForm() {
             consumptions,
         })
 
+        setClientId(client?.id ?? null)
+        setSavedProposal(proposal ?? null)
         setSelectedSimulationId(simulation.id)
 
         const averageConsumption = Number(simulation.averageConsumption)
@@ -321,6 +330,9 @@ export function SimulationForm() {
                                 type="number"
                                 step="0.01"
                                 placeholder="0.95"
+                                onSelect={(e) =>
+                                    e.currentTarget.select()
+                                }
                                 value={watch('tariff') ?? 0.95}
                                 {...register('tariff')}
                             />
@@ -354,6 +366,9 @@ export function SimulationForm() {
                                     <Input
                                         type="number"
                                         placeholder="0"
+                                        onSelect={(e) =>
+                                            e.currentTarget.select()
+                                        }
                                         {...register(
                                             `consumptions.${index}`
                                         )}
@@ -412,6 +427,7 @@ export function SimulationForm() {
                                 connectionType={watch('connectionType')}
                                 tariff={Number(watch('tariff')) || 0.95}
                                 coverage={Number((results.estimatedGeneration / results.averageConsumption * 100).toFixed(2)) || 0}
+                                proposal={savedProposal}
                             />
                         </div>
                     )

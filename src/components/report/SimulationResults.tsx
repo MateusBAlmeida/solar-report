@@ -35,6 +35,17 @@ import {
     SelectItem
 } from '../ui/select'
 
+type ProposalValues = {
+    kitPrice?: number | string | null
+    projectPrice?: number | string | null
+    installationPrice?: number | string | null
+    totalInvestment?: number | string | null
+    paybackYears?: number | string | null
+    descriptionPlacas?: string | null
+    descriptionInversor?: string | null
+    inversor?: string | null
+}
+
 type Props = {
     averageConsumption: number
     systemPower: number
@@ -52,6 +63,7 @@ type Props = {
     coverage?: number
     onSaveSimulation?: (payload: Record<string, unknown>) => Promise<void> | void
     selectedSimulationId?: string | null
+    proposal?: ProposalValues | null
 }
 
 const months = [
@@ -86,6 +98,7 @@ export function SimulationResults({
     coverage,
     onSaveSimulation,
     selectedSimulationId,
+    proposal,
 }: Props) {
     const chartRef =
         useRef<HTMLDivElement>(null)
@@ -108,12 +121,15 @@ export function SimulationResults({
     const [recalculatedRoofArea, setRecalculatedRoofArea] =
         useState(roofArea)
 
-    const [kitPrice, setKitPrice] = useState(0.00)
-    const [installationPrice, setInstallationPrice] = useState(0.00)
+    const [kitPrice, setKitPrice] = useState(Number(proposal?.kitPrice ?? 0.00))
+    const [installationPrice, setInstallationPrice] = useState(Number(proposal?.installationPrice ?? proposal?.projectPrice ?? 0.00))
 
-    const [descriptionPlacas, setDescriptionPlacas] = useState('')
-    const [descriptionInversor, setDescriptionInversor] = useState('')
-    const [inversor, setInversor] = useState('')
+    const [descriptionPlacas, setDescriptionPlacas] = useState(proposal?.descriptionPlacas ?? '')
+    const [descriptionInversor, setDescriptionInversor] = useState(proposal?.descriptionInversor ?? '')
+    const [inversor, setInversor] = useState(proposal?.inversor ?? '')
+    const [isSaving, setIsSaving] = useState(false)
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
+    const [saveMessage, setSaveMessage] = useState('')
 
     const totalInvestment =
         kitPrice + installationPrice
@@ -147,30 +163,44 @@ export function SimulationResults({
     async function handleSaveProposal() {
         if (!onSaveSimulation) return
 
-        await onSaveSimulation({
-            customerName,
-            city,
-            state,
-            connectionType: connectionType || 'Monofásico',
-            tariff: Number(tariff ?? 0.95),
-            consumptions: consumptions.map((value) => Number(value) || 0),
-            averageConsumption,
-            systemPower: recalculatedPower,
-            panels: editablePanels,
-            roofArea: recalculatedRoofArea,
-            estimatedGeneration: recalculatedGeneration,
-            monthlySavings: recalculatedSavings,
-            coverage: typeof coverage === 'number' ? coverage : Number(((recalculatedGeneration / averageConsumption) * 100).toFixed(2)) || 0,
-            kitPrice,
-            projectPrice: installationPrice,
-            installationPrice,
-            totalInvestment,
-            paybackYears,
-            descriptionPlacas,
-            descriptionInversor,
-            inversor,
-            pdfUrl: null,
-        })
+        setIsSaving(true)
+        setSaveStatus('saving')
+        setSaveMessage(selectedSimulationId ? 'Atualizando simulação...' : 'Salvando simulação...')
+
+        try {
+            await onSaveSimulation({
+                customerName,
+                city,
+                state,
+                connectionType: connectionType || 'Monofásico',
+                tariff: Number(tariff ?? 0.95),
+                consumptions: consumptions.map((value) => Number(value) || 0),
+                averageConsumption,
+                systemPower: recalculatedPower,
+                panels: editablePanels,
+                roofArea: recalculatedRoofArea,
+                estimatedGeneration: recalculatedGeneration,
+                monthlySavings: recalculatedSavings,
+                coverage: typeof coverage === 'number' ? coverage : Number(((recalculatedGeneration / averageConsumption) * 100).toFixed(2)) || 0,
+                kitPrice,
+                projectPrice: installationPrice,
+                installationPrice,
+                totalInvestment,
+                paybackYears,
+                descriptionPlacas,
+                descriptionInversor,
+                inversor,
+                pdfUrl: null,
+            })
+
+            setSaveStatus('success')
+            setSaveMessage(selectedSimulationId ? 'Simulação atualizada com sucesso.' : 'Simulação salva com sucesso.')
+        } catch (error) {
+            setSaveStatus('error')
+            setSaveMessage(error instanceof Error ? error.message : 'Não foi possível salvar a simulação.')
+        } finally {
+            setIsSaving(false)
+        }
     }
 
     useEffect(() => {
@@ -180,6 +210,16 @@ export function SimulationResults({
         setRecalculatedSavings(monthlySavings)
         setRecalculatedRoofArea(roofArea)
     }, [panels, systemPower, estimatedGeneration, monthlySavings, roofArea])
+
+    useEffect(() => {
+        if (!proposal) return
+
+        setKitPrice(Number(proposal.kitPrice ?? 0))
+        setInstallationPrice(Number(proposal.installationPrice ?? proposal.projectPrice ?? 0))
+        setDescriptionPlacas(proposal.descriptionPlacas ?? '')
+        setDescriptionInversor(proposal.descriptionInversor ?? '')
+        setInversor(proposal.inversor ?? '')
+    }, [proposal])
 
     useEffect(() => {
 
@@ -202,7 +242,7 @@ export function SimulationResults({
         const newSavings =
             calculateMonthlySavings(
                 averageGeneration,
-                0.95
+                tariff ?? 0.95
             )
 
         const newRoofArea =
@@ -480,6 +520,7 @@ export function SimulationResults({
 
                             <Input
                                 type="text"
+                                value={descriptionPlacas}
                                 placeholder="Descrição das placas"
                                 onChange={(e) => {
                                     setDescriptionPlacas(e.target.value)
@@ -488,7 +529,8 @@ export function SimulationResults({
                             />
 
                             <div className='space-y-2 mt-4 font-bold'>
-                            <Select 
+                            <Select
+                                value={inversor || undefined}
                                 onValueChange={(value) => {
                                     setInversor(
                                         value as string
@@ -511,7 +553,8 @@ export function SimulationResults({
 
                             <Input
                                 type="text"
-                                placeholder={`Descrição do ${inversor}`}
+                                value={descriptionInversor}
+                                placeholder={`Descrição do ${inversor || 'inversor'}`}
                                 onChange={(e) => {
                                     setDescriptionInversor(e.target.value)
                                 }}
@@ -522,13 +565,36 @@ export function SimulationResults({
                     </div>
 
                     {onSaveSimulation && (
-                        <Button
-                            type="button"
-                            onClick={handleSaveProposal}
-                            className="bg-slate-700 hover:bg-slate-800"
-                        >
-                            {selectedSimulationId ? 'Atualizar simulação' : 'Salvar simulação'}
-                        </Button>
+                        <div className="space-y-3">
+                            <Button
+                                type="button"
+                                onClick={handleSaveProposal}
+                                disabled={isSaving}
+                                className={[
+                                    'w-full',
+                                    isSaving ? 'bg-slate-500 cursor-not-allowed' : 'bg-slate-700 hover:bg-slate-800',
+                                    saveStatus === 'success' ? 'bg-emerald-600 hover:bg-emerald-700' : '',
+                                    saveStatus === 'error' ? 'bg-red-600 hover:bg-red-700' : '',
+                                ].join(' ')}
+                            >
+                                {isSaving
+                                    ? selectedSimulationId ? 'Atualizando simulação...' : 'Salvando simulação...'
+                                    : selectedSimulationId ? 'Atualizar simulação' : 'Salvar simulação'}
+                            </Button>
+
+                            {saveMessage && (
+                                <div
+                                    className={[
+                                        'rounded-md border px-3 py-2 text-sm',
+                                        saveStatus === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : '',
+                                        saveStatus === 'error' ? 'border-red-200 bg-red-50 text-red-700' : '',
+                                        saveStatus === 'saving' ? 'border-sky-200 bg-sky-50 text-sky-700' : '',
+                                    ].join(' ')}
+                                >
+                                    {saveMessage}
+                                </div>
+                            )}
+                        </div>
                     )}
 
                     <DownloadReportButton

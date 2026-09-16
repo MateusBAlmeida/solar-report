@@ -41,17 +41,24 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
 
+    const currentSimulation = await prisma.simulation.findUnique({
+      where: { id },
+      include: { client: true },
+    })
+
+    const clientId = body.clientId ?? currentSimulation?.clientId ?? null
+
     const simulation = await prisma.$transaction(async (tx: any) => {
-      const client = body.clientId
+      const client = clientId
         ? await tx.client.upsert({
-            where: { id: body.clientId },
+            where: { id: clientId },
             update: {
               name: body.customerName,
               city: body.city,
               state: body.state,
             },
             create: {
-              id: body.clientId,
+              id: clientId,
               name: body.customerName,
               city: body.city,
               state: body.state,
