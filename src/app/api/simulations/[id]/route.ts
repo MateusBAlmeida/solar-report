@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { broadcastMessage } from '@/lib/realtime'
 
 export async function GET(
   _request: Request,
@@ -21,6 +22,13 @@ export async function GET(
         { error: 'Simulação não encontrada.' },
         { status: 404 }
       )
+    }
+
+    // broadcast updated simulation to connected realtime clients
+    try {
+      broadcastMessage({ type: 'updated', simulation })
+    } catch (e) {
+      console.error('Erro ao broadcast atualizar simulação:', e)
     }
 
     return NextResponse.json({ simulation })

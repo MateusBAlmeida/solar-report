@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { broadcastMessage } from '@/lib/realtime'
 
 export async function GET() {
   try {
@@ -98,6 +99,13 @@ export async function POST(request: Request) {
         },
       })
     })
+
+    // broadcast new simulation to connected realtime clients
+    try {
+      broadcastMessage({ type: 'created', simulation })
+    } catch (e) {
+      console.error('Erro ao broadcast criar simulação:', e)
+    }
 
     return NextResponse.json({ simulation })
   } catch (error) {
