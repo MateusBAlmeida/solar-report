@@ -14,9 +14,16 @@ export default function Home() {
 
         <Link
           href="/simulator"
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl"
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl block"
         >
           Iniciar Simulação
+        </Link>
+
+        <Link
+          href="/budgets"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl block"
+        >
+          Orçamentos
         </Link>
       </div>
     </main>

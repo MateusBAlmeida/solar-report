@@ -1,14 +1,23 @@
 
 "use client";
 
-import { useState } from "react";
-import { Plus, Trash2, FileText, ArrowLeft } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import {
+  Plus,
+  FileText,
+  Eye,
+  Trash2,
+  RefreshCw,
+} from "lucide-react";
 
-type BudgetItem = {
-  description: string;
-  quantity: number;
-  unitPrice: number;
+type Budget = {
+  id: string;
+  number: string;
+  clientName: string;
+  projectTitle: string;
+  total: number;
+  createdAt: string;
 };
 
 const currency = (value: number) =>
@@ -17,306 +26,193 @@ const currency = (value: number) =>
     currency: "BRL",
   }).format(value);
 
+const dateFormat = (value: string) =>
+  new Intl.DateTimeFormat("pt-BR").format(new Date(value));
+
 export default function BudgetsPage() {
-  const [clientName, setClientName] = useState("");
-  const [projectTitle, setProjectTitle] = useState("");
-  const [activitiesDescription, setActivitiesDescription] = useState("");
-  const [observations, setObservations] = useState("");
-  const [paymentConditions, setPaymentConditions] = useState("");
-  const [items, setItems] = useState<BudgetItem[]>([
-    { description: "", quantity: 1, unitPrice: 0 },
-  ]);
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
+  const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const total = items.reduce(
-    (sum, item) => sum + item.quantity * item.unitPrice,
-    0
-  );
-
-  function updateItem(
-    index: number,
-    field: keyof BudgetItem,
-    value: string
-  ) {
-    setItems((current) =>
-      current.map((item, i) =>
-        i === index
-          ? {
-              ...item,
-              [field]:
-                field === "description" ? value : Number(value),
-            }
-          : item
-      )
-    );
-  }
-
-  function addItem() {
-    setItems((current) => [
-      ...current,
-      { description: "", quantity: 1, unitPrice: 0 },
-    ]);
-  }
-
-  function removeItem(index: number) {
-    setItems((current) => current.filter((_, i) => i !== index));
-  }
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSaving(true);
-    setMessage("");
+  const loadBudgets = useCallback(async () => {
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch("/api/budgets", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          companyName: "ElTec Elétrica",
-          companyCnpj: "28.319.381/0001-95",
-          companyAddress:
-            "Sítio Santa Luzia, S/N. Limas do Pará, Pará de Minas - MG",
-          companyPhone: "37 9 9779-5059",
-          companyEmail: "eletricaeltec@gmail.com",
-          clientName,
-          projectTitle,
-          activitiesDescription,
-          observations,
-          paymentConditions,
-          items,
-        }),
+      const response = await fetch("/api/budgets");
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error ?? "Erro ao carregar orçamentos.");
+      }
+
+      setBudgets(result);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Não foi possível carregar os orçamentos."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadBudgets();
+  }, [loadBudgets]);
+
+  async function handleDelete(budget: Budget) {
+    const confirmed = window.confirm(
+      `Deseja excluir o orçamento ${budget.number}?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/api/budgets/${budget.id}`, {
+        method: "DELETE",
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error ?? "Não foi possível salvar.");
+        throw new Error(result.error ?? "Não foi possível excluir.");
       }
 
-      setMessage(`Orçamento ${result.number} salvo com sucesso!`);
-    } catch (error) {
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : "Erro ao salvar o orçamento."
+      setBudgets((current) =>
+        current.filter((item) => item.id !== budget.id)
       );
-    } finally {
-      setSaving(false);
+    } catch (err) {
+      window.alert(
+        err instanceof Error ? err.message : "Erro ao excluir orçamento."
+      );
     }
   }
 
-  const inputClass =
-    "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring";
-
-  const labelClass = "mb-1.5 block text-sm font-medium";
-
   return (
     <main className="min-h-screen bg-muted/30 px-4 py-8">
-      <div className="mx-auto max-w-5xl space-y-6">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/"
-            className="rounded-lg border bg-background p-2 hover:bg-muted"
-            aria-label="Voltar"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
+      <div className="mx-auto max-w-6xl space-y-6">
+        <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-2xl font-semibold">Novo orçamento</h1>
-            <p className="text-sm text-muted-foreground">
-              Preencha os dados e adicione os itens do orçamento.
+            <h1 className="text-2xl font-semibold">Orçamentos</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Consulte e gerencie os orçamentos cadastrados.
             </p>
           </div>
-        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <section className="rounded-xl border bg-card p-5">
-            <h2 className="mb-4 flex items-center gap-2 font-semibold">
-              <FileText className="h-4 w-4" />
-              Dados do projeto
-            </h2>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={loadBudgets}
+              className="inline-flex items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm hover:bg-muted"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Atualizar
+            </button>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label className={labelClass}>Cliente</label>
-                <input
-                  className={inputClass}
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  required
-                  placeholder="Nome do cliente"
-                />
-              </div>
+            <Link
+              href="/budgets/new"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+            >
+              <Plus className="h-4 w-4" />
+              Novo orçamento
+            </Link>
+          </div>
+        </header>
 
-              <div>
-                <label className={labelClass}>Título do projeto</label>
-                <input
-                  className={inputClass}
-                  value={projectTitle}
-                  onChange={(e) => setProjectTitle(e.target.value)}
-                  required
-                  placeholder="Ex.: Projeto multimídia"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className={labelClass}>
-                  Descrição das atividades
-                </label>
-                <textarea
-                  className={inputClass}
-                  rows={4}
-                  value={activitiesDescription}
-                  onChange={(e) =>
-                    setActivitiesDescription(e.target.value)
-                  }
-                  placeholder="Descreva os serviços e atividades..."
-                />
-              </div>
+        <section className="overflow-hidden rounded-xl border bg-card">
+          {loading ? (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              Carregando orçamentos...
             </div>
-          </section>
-
-          <section className="rounded-xl border bg-card p-5">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <h2 className="font-semibold">Itens do orçamento</h2>
+          ) : error ? (
+            <div className="p-8 text-center">
+              <p className="text-sm text-destructive">{error}</p>
               <button
-                type="button"
-                onClick={addItem}
-                className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm hover:bg-muted"
+                onClick={loadBudgets}
+                className="mt-3 rounded-lg border px-3 py-2 text-sm hover:bg-muted"
               >
-                <Plus className="h-4 w-4" />
-                Adicionar item
+                Tentar novamente
               </button>
             </div>
-
-            <div className="space-y-3">
-              {items.map((item, index) => (
-                <div
-                  key={index}
-                  className="grid gap-3 rounded-lg border p-3 md:grid-cols-[minmax(0,1fr)_100px_150px_150px_40px]"
-                >
-                  <div>
-                    <label className={labelClass}>Descrição</label>
-                    <input
-                      className={inputClass}
-                      value={item.description}
-                      onChange={(e) =>
-                        updateItem(index, "description", e.target.value)
-                      }
-                      required
-                      placeholder="Produto ou serviço"
-                    />
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>Quantidade</label>
-                    <input
-                      className={inputClass}
-                      type="number"
-                      min="0.01"
-                      step="0.01"
-                      value={item.quantity}
-                      onChange={(e) =>
-                        updateItem(index, "quantity", e.target.value)
-                      }
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>Preço unitário</label>
-                    <input
-                      className={inputClass}
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={item.unitPrice}
-                      onChange={(e) =>
-                        updateItem(index, "unitPrice", e.target.value)
-                      }
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>Subtotal</label>
-                    <div className="flex h-9 items-center text-sm font-medium">
-                      {currency(item.quantity * item.unitPrice)}
-                    </div>
-                  </div>
-
-                  <div className="flex items-end">
-                    <button
-                      type="button"
-                      onClick={() => removeItem(index)}
-                      disabled={items.length === 1}
-                      className="rounded-lg p-2 text-destructive hover:bg-destructive/10 disabled:opacity-30"
-                      aria-label="Remover item"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5 flex justify-end border-t pt-4">
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">
-                  Valor total
+          ) : budgets.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 p-10 text-center">
+              <FileText className="h-10 w-10 text-muted-foreground" />
+              <div>
+                <h2 className="font-medium">Nenhum orçamento cadastrado</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Crie seu primeiro orçamento para começar.
                 </p>
-                <p className="text-2xl font-semibold">{currency(total)}</p>
               </div>
+              <Link
+                href="/budgets/new"
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+              >
+                Criar orçamento
+              </Link>
             </div>
-          </section>
-
-          <section className="rounded-xl border bg-card p-5">
-            <h2 className="mb-4 font-semibold">Condições e observações</h2>
-
-            <div className="grid gap-4">
-              <div>
-                <label className={labelClass}>Observações</label>
-                <textarea
-                  className={inputClass}
-                  rows={3}
-                  value={observations}
-                  onChange={(e) => setObservations(e.target.value)}
-                  placeholder="Observações adicionais..."
-                />
-              </div>
-
-              <div>
-                <label className={labelClass}>
-                  Condições de pagamento
-                </label>
-                <textarea
-                  className={inputClass}
-                  rows={2}
-                  value={paymentConditions}
-                  onChange={(e) => setPaymentConditions(e.target.value)}
-                  placeholder="Ex.: Pagamento a combinar"
-                />
-              </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b bg-muted/50 text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Número</th>
+                    <th className="px-4 py-3 font-medium">Cliente</th>
+                    <th className="px-4 py-3 font-medium">Projeto</th>
+                    <th className="px-4 py-3 font-medium">Data</th>
+                    <th className="px-4 py-3 text-right font-medium">Total</th>
+                    <th className="px-4 py-3 text-right font-medium">Ações</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {budgets.map((budget) => (
+                    <tr key={budget.id} className="hover:bg-muted/30">
+                      <td className="whitespace-nowrap px-4 py-3 font-medium">
+                        {budget.number}
+                      </td>
+                      <td className="px-4 py-3">{budget.clientName}</td>
+                      <td className="px-4 py-3">{budget.projectTitle}</td>
+                      <td className="whitespace-nowrap px-4 py-3">
+                        {dateFormat(budget.createdAt)}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-right font-medium">
+                        {currency(budget.total)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex justify-end gap-1">
+                          <Link
+                            href={`/budgets/${budget.id}`}
+                            className="rounded-lg p-2 hover:bg-muted"
+                            title="Visualizar"
+                            aria-label="Visualizar orçamento"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(budget)}
+                            className="rounded-lg p-2 text-destructive hover:bg-destructive/10"
+                            title="Excluir"
+                            aria-label="Excluir orçamento"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </section>
-
-          {message && (
-            <p className="rounded-lg border bg-background p-3 text-sm">
-              {message}
-            </p>
           )}
+        </section>
 
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
-            >
-              {saving ? "Salvando..." : "Salvar orçamento"}
-            </button>
-          </div>
-        </form>
+        {!loading && !error && budgets.length > 0 && (
+          <p className="text-sm text-muted-foreground">
+            {budgets.length} orçamento(s) cadastrado(s)
+          </p>
+        )}
       </div>
     </main>
   );
