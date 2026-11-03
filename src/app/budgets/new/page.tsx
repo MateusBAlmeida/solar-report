@@ -116,7 +116,7 @@ export default function BudgetsPage() {
       <div className="mx-auto max-w-5xl space-y-6">
         <div className="flex items-center gap-3">
           <Link
-            href="/"
+            href="/budgets"
             className="rounded-lg border bg-background p-2 hover:bg-muted"
             aria-label="Voltar"
           >
@@ -156,7 +156,7 @@ export default function BudgetsPage() {
                   value={projectTitle}
                   onChange={(e) => setProjectTitle(e.target.value)}
                   required
-                  placeholder="Ex.: Projeto multimídia"
+                  placeholder="Nome do projeto ou serviço"
                 />
               </div>
 
@@ -214,8 +214,8 @@ export default function BudgetsPage() {
                     <input
                       className={inputClass}
                       type="number"
-                      min="0.01"
-                      step="0.01"
+                      min="1"
+                      step="1"
                       value={item.quantity}
                       onChange={(e) =>
                         updateItem(index, "quantity", e.target.value)

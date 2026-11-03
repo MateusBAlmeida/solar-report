@@ -9,6 +9,7 @@ import {
   Eye,
   Trash2,
   RefreshCw,
+  Home,
 } from "lucide-react";
 
 type Budget = {
@@ -102,6 +103,13 @@ export default function BudgetsPage() {
           </div>
 
           <div className="flex gap-2">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm hover:bg-muted"
+            >
+              <Home className="h-4 w-4" />
+              Voltar
+            </Link>
             <button
               type="button"
               onClick={loadBudgets}

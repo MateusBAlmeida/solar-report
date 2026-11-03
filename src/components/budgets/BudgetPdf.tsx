@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -49,6 +48,13 @@ const formatDate = (value: string) =>
     year: "numeric",
   }).format(new Date(value));
 
+/** Quebra texto por linhas e remove marcadores vazios */
+const toLines = (text: string | null) =>
+  (text ?? "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+
 const styles = StyleSheet.create({
   page: {
     paddingTop: 38,
@@ -58,47 +64,46 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
     color: "#222222",
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderBottomColor: "#333333",
-    paddingBottom: 12,
+  // Cabeçalho da empresa (uma linha, como no DOCX)
+  companyHeader: {
+    fontSize: 8,
+    lineHeight: 1.4,
     marginBottom: 18,
   },
   companyName: {
-    fontSize: 17,
     fontFamily: "Helvetica-Bold",
-    marginBottom: 5,
-  },
-  companyInfo: {
-    fontSize: 9,
-    lineHeight: 1.5,
-  },
-  budgetInfo: {
-    textAlign: "right",
-    fontSize: 9,
-    lineHeight: 1.5,
-  },
-  budgetNumber: {
-    fontSize: 13,
-    fontFamily: "Helvetica-Bold",
-    marginBottom: 4,
   },
   projectTitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: "Helvetica-Bold",
-    marginBottom: 10,
+    marginBottom: 14,
   },
-  client: {
-    fontSize: 10,
-    marginBottom: 18,
+  clientBlock: {
+    marginBottom: 16,
+  },
+  clientLabel: {
+    fontFamily: "Helvetica-Bold",
   },
   sectionTitle: {
     fontSize: 10,
     fontFamily: "Helvetica-Bold",
     textTransform: "uppercase",
     marginBottom: 7,
+  },
+  bulletList: {
+    marginBottom: 15,
+  },
+  bulletLine: {
+    fontSize: 10,
+    lineHeight: 1.5,
+    flexDirection: "row",
+    marginBottom: 4,
+  },
+  bullet: {
+    width: 12,
+  },
+  bulletText: {
+    flex: 1,
   },
   paragraph: {
     fontSize: 10,
@@ -126,22 +131,10 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: 5,
   },
-  description: {
-    width: "48%",
-    paddingRight: 5,
-  },
-  quantity: {
-    width: "12%",
-    textAlign: "right",
-  },
-  unitPrice: {
-    width: "20%",
-    textAlign: "right",
-  },
-  subtotal: {
-    width: "20%",
-    textAlign: "right",
-  },
+  description: { width: "48%", paddingRight: 5 },
+  quantity: { width: "12%", textAlign: "right" },
+  unitPrice: { width: "20%", textAlign: "right" },
+  subtotal: { width: "20%", textAlign: "right" },
   totalRow: {
     flexDirection: "row",
     justifyContent: "flex-end",
@@ -191,9 +184,10 @@ const styles = StyleSheet.create({
 });
 
 function BudgetDocument({ budget }: { budget: BudgetPdfData }) {
-  const sortedItems = [...budget.items].sort(
-    (a, b) => a.position - b.position
-  );
+  const sortedItems = [...budget.items].sort((a, b) => a.position - b.position);
+  const activities = toLines(budget.activitiesDescription);
+  const observations = toLines(budget.observations);
+  const paymentConditions = toLines(budget.paymentConditions);
 
   return (
     <Document
@@ -202,114 +196,100 @@ function BudgetDocument({ budget }: { budget: BudgetPdfData }) {
       subject="Orçamento"
     >
       <Page size="A4" style={styles.page} wrap>
-        <View style={styles.header}>
-          <View style={{ width: "65%" }}>
-            <Text style={styles.companyName}>{budget.companyName}</Text>
-            {budget.companyCnpj && (
-              <Text style={styles.companyInfo}>
-                CNPJ: {budget.companyCnpj}
-              </Text>
-            )}
-            {budget.companyAddress && (
-              <Text style={styles.companyInfo}>
-                {budget.companyAddress}
-              </Text>
-            )}
-            {budget.companyPhone && (
-              <Text style={styles.companyInfo}>
-                Tel.: {budget.companyPhone}
-              </Text>
-            )}
-            {budget.companyEmail && (
-              <Text style={styles.companyInfo}>
-                {budget.companyEmail}
-              </Text>
-            )}
-          </View>
+        {/* Cabeçalho — uma linha como no DOCX */}
+        <Text style={styles.companyHeader}>
+          <Text style={styles.companyName}>{budget.companyName} </Text>
+          {budget.companyCnpj && <>CNPJ: {budget.companyCnpj}. </>}
+          {budget.companyAddress && <>{budget.companyAddress}. </>}
+          {budget.companyPhone && <>Tel.: {budget.companyPhone}. </>}
+          {budget.companyEmail && <>E-mail: {budget.companyEmail}.</>}
+        </Text>
 
-          <View style={{ width: "35%" }}>
-            <Text style={styles.budgetInfo}>ORÇAMENTO</Text>
-            <Text style={styles.budgetNumber}>{budget.number}</Text>
-            <Text style={styles.budgetInfo}>
-              {formatDate(budget.createdAt)}
-            </Text>
-          </View>
-        </View>
-
+        {/* Título do projeto */}
         <Text style={styles.projectTitle}>{budget.projectTitle}</Text>
-        <Text style={styles.client}>
-          <Text style={{ fontFamily: "Helvetica-Bold" }}>CLIENTE: </Text>
+
+        {/* Cliente */}
+        <Text style={styles.clientBlock}>
+          <Text style={styles.clientLabel}>CLIENTE</Text>
+          {"  "}
           {budget.clientName}
         </Text>
 
-        {budget.activitiesDescription && (
+        {/* Descrição das atividades (com bullets) */}
+        {activities.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              Descrição das atividades
-            </Text>
-            <Text style={styles.paragraph}>
-              {budget.activitiesDescription}
-            </Text>
+            <Text style={styles.sectionTitle}>Descrição das atividades</Text>
+            <View style={styles.bulletList}>
+              {activities.map((line, i) => (
+                <View key={i} style={styles.bulletLine} wrap={false}>
+                  <Text style={styles.bullet}>•</Text>
+                  <Text style={styles.bulletText}>{line}</Text>
+                </View>
+              ))}
+            </View>
           </View>
         )}
 
+        {/* Preços */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Preços</Text>
-
           <View style={styles.table}>
             <View style={styles.tableHeader}>
-              <Text style={styles.description}>Item</Text>
-              <Text style={styles.quantity}>Qtd.</Text>
-              <Text style={styles.unitPrice}>Valor unitário</Text>
-              <Text style={styles.subtotal}>Subtotal</Text>
+              <Text style={styles.description}>ITEM</Text>
+              <Text style={styles.quantity}>QUANTIDADE</Text>
+              <Text style={styles.unitPrice}>VALOR</Text>
+              <Text style={styles.subtotal}>SUBTOTAL</Text>
             </View>
-
             {sortedItems.map((item) => (
               <View key={item.id} style={styles.tableRow} wrap={false}>
                 <Text style={styles.description}>{item.description}</Text>
                 <Text style={styles.quantity}>{item.quantity}</Text>
-                <Text style={styles.unitPrice}>
-                  {formatCurrency(item.unitPrice)}
-                </Text>
-                <Text style={styles.subtotal}>
-                  {formatCurrency(item.subtotal)}
-                </Text>
+                <Text style={styles.unitPrice}>{formatCurrency(item.unitPrice)}</Text>
+                <Text style={styles.subtotal}>{formatCurrency(item.subtotal)}</Text>
               </View>
             ))}
-
             <View style={styles.totalRow} wrap={false}>
               <Text style={styles.totalLabel}>TOTAL</Text>
-              <Text style={styles.totalValue}>
-                {formatCurrency(budget.total)}
-              </Text>
+              <Text style={styles.totalValue}>{formatCurrency(budget.total)}</Text>
             </View>
           </View>
         </View>
 
-        {budget.observations && (
+        {/* Observações */}
+        {observations.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Observações</Text>
-            <Text style={styles.paragraph}>{budget.observations}</Text>
+            <View style={styles.bulletList}>
+              {observations.map((line, i) => (
+                <View key={i} style={styles.bulletLine} wrap={false}>
+                  <Text style={styles.bulletText}>{line}</Text>
+                </View>
+              ))}
+            </View>
           </View>
         )}
 
-        {budget.paymentConditions && (
+        {/* Condições de contrato */}
+        {paymentConditions.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              Condições de pagamento
-            </Text>
-            <Text style={styles.paragraph}>
-              {budget.paymentConditions}
-            </Text>
+            <Text style={styles.sectionTitle}>Condições de contrato</Text>
+            <View style={styles.bulletList}>
+              {paymentConditions.map((line, i) => (
+                <View key={i} style={styles.bulletLine} wrap={false}>
+                  <Text style={styles.bullet}>•</Text>
+                  <Text style={styles.bulletText}>{line}</Text>
+                </View>
+              ))}
+            </View>
           </View>
         )}
 
+        {/* Assinaturas */}
         <View style={styles.signatureArea} wrap={false}>
           <View style={styles.signature}>
             <Text>{budget.clientName}</Text>
             <Text>Cliente</Text>
           </View>
-
           <View style={styles.signature}>
             <Text>{budget.companyName}</Text>
             <Text>Responsável pelo orçamento</Text>
@@ -330,11 +310,7 @@ function BudgetDocument({ budget }: { budget: BudgetPdfData }) {
   );
 }
 
-export function BudgetPdfDownload({
-  budget,
-}: {
-  budget: BudgetPdfData;
-}) {
+export function BudgetPdfDownload({ budget }: { budget: BudgetPdfData }) {
   const filename = `${budget.number.replaceAll("/", "-")}.pdf`;
 
   return (
