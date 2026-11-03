@@ -53,7 +53,9 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Client: 'Client',
   Simulation: 'Simulation',
-  Proposal: 'Proposal'
+  Proposal: 'Proposal',
+  Budget: 'Budget',
+  BudgetItem: 'BudgetItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -124,6 +126,42 @@ export const ProposalScalarFieldEnum = {
 } as const
 
 export type ProposalScalarFieldEnum = (typeof ProposalScalarFieldEnum)[keyof typeof ProposalScalarFieldEnum]
+
+
+export const BudgetScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  companyName: 'companyName',
+  companyCnpj: 'companyCnpj',
+  companyAddress: 'companyAddress',
+  companyPhone: 'companyPhone',
+  companyEmail: 'companyEmail',
+  clientName: 'clientName',
+  projectTitle: 'projectTitle',
+  activitiesDescription: 'activitiesDescription',
+  observations: 'observations',
+  paymentConditions: 'paymentConditions',
+  total: 'total',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BudgetScalarFieldEnum = (typeof BudgetScalarFieldEnum)[keyof typeof BudgetScalarFieldEnum]
+
+
+export const BudgetItemScalarFieldEnum = {
+  id: 'id',
+  description: 'description',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  subtotal: 'subtotal',
+  position: 'position',
+  budgetId: 'budgetId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BudgetItemScalarFieldEnum = (typeof BudgetItemScalarFieldEnum)[keyof typeof BudgetItemScalarFieldEnum]
 
 
 export const SortOrder = {

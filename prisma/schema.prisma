@@ -10,10 +10,10 @@ datasource db {
 model Client {
   id String @id @default(cuid())
 
-  name String
+  name  String
   email String?
   phone String?
-  city String
+  city  String
   state String
 
   createdAt DateTime @default(now())
@@ -25,17 +25,17 @@ model Client {
 model Simulation {
   id String @id @default(cuid())
 
-  averageConsumption Float
-  systemPower Float
-  panels Int
-  roofArea Float
+  averageConsumption  Float
+  systemPower         Float
+  panels              Int
+  roofArea            Float
   estimatedGeneration Float
-  monthlyGeneration Json
-  monthlySavings Float
-  coverage Float
-  connectionType String
-  tariff Float
-  consumptions Json
+  monthlyGeneration   Json
+  monthlySavings      Float
+  coverage            Float
+  connectionType      String
+  tariff              Float
+  consumptions        Json
 
   clientId String
 
@@ -50,19 +50,63 @@ model Simulation {
 model Proposal {
   id String @id @default(cuid())
 
-  kitPrice Float
-  projectPrice Float
-  installationPrice Float
-  totalInvestment Float
-  paybackYears Float
-  pdfUrl String?
-  descriptionPlacas String?
+  kitPrice            Float
+  projectPrice        Float
+  installationPrice   Float
+  totalInvestment     Float
+  paybackYears        Float
+  pdfUrl              String?
+  descriptionPlacas   String?
   descriptionInversor String?
-  inversor String?
+  inversor            String?
 
   simulationId String @unique
 
   simulation Simulation @relation(fields: [simulationId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Budget {
+  id String @id @default(cuid())
+
+  number String @unique
+
+  companyName    String
+  companyCnpj    String?
+  companyAddress String?
+  companyPhone   String?
+  companyEmail   String?
+
+  clientName   String
+  projectTitle String
+
+  activitiesDescription String?
+
+  observations      String?
+  paymentConditions String?
+
+  total Float @default(0)
+
+  items BudgetItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BudgetItem {
+  id String @id @default(cuid())
+
+  description String
+  quantity    Float
+  unitPrice   Float
+  subtotal    Float
+
+  position Int @default(0)
+
+  budgetId String
+  budget   Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -32,3 +32,13 @@ export type Simulation = Prisma.SimulationModel
  * 
  */
 export type Proposal = Prisma.ProposalModel
+/**
+ * Model Budget
+ * 
+ */
+export type Budget = Prisma.BudgetModel
+/**
+ * Model BudgetItem
+ * 
+ */
+export type BudgetItem = Prisma.BudgetItemModel

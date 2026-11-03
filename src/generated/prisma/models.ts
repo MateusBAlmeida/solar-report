@@ -11,4 +11,6 @@
 export type * from './models/Client'
 export type * from './models/Simulation'
 export type * from './models/Proposal'
+export type * from './models/Budget'
+export type * from './models/BudgetItem'
 export type * from './commonInputTypes'
