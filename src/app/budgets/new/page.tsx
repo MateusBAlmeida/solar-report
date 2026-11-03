@@ -17,6 +17,30 @@ const currency = (value: number) =>
     currency: "BRL",
   }).format(value);
 
+const formatPriceInput = (value: number) =>
+  new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    useGrouping: false,
+  }).format(value);
+
+const parsePriceInput = (value: string) => {
+  const normalized = value.replace(".", "").replace(",", ".");
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const maskPriceInput = (value: string) => {
+  const digits = value.replace(/\D/g, "");
+
+  if (!digits) return "";
+
+  const integerPart = digits.length > 3 ? digits.slice(0, -2) : "0";
+  const decimalPart = digits.slice(-2).padStart(2, "0");
+
+  return `${integerPart.replace(/^0+(?=\d)/, "") || "0"},${decimalPart}`;
+};
+
 export default function BudgetsPage() {
   const [clientName, setClientName] = useState("");
   const [projectTitle, setProjectTitle] = useState("");
@@ -45,7 +69,11 @@ export default function BudgetsPage() {
           ? {
               ...item,
               [field]:
-                field === "description" ? value : Number(value),
+                field === "description"
+                  ? value
+                  : field === "unitPrice"
+                    ? parsePriceInput(value)
+                    : Number(value),
             }
           : item
       )
@@ -228,12 +256,18 @@ export default function BudgetsPage() {
                     <label className={labelClass}>Preço unitário</label>
                     <input
                       className={inputClass}
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       min="0"
                       step="0.01"
-                      value={item.unitPrice}
+                      placeholder="0,00"
+                      value={formatPriceInput(item.unitPrice)}
                       onChange={(e) =>
-                        updateItem(index, "unitPrice", e.target.value)
+                        updateItem(
+                          index,
+                          "unitPrice",
+                          maskPriceInput(e.target.value)
+                        )
                       }
                       required
                     />
