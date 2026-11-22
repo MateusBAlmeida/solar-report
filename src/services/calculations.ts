@@ -60,7 +60,7 @@ export function calculateAverageGeneration(
       0
     )
 
-  return total / 12
+  return total / monthlyGeneration.length
 }
 
 export function calculatePanels(
