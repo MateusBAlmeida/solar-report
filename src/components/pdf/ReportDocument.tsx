@@ -498,7 +498,7 @@ export function ReportDocument({
                     </Text>
 
                     <Text style={{ marginBottom: 4 }}>
-                        Geração Estimada : {monthlyGeneration.reduce((sum, value) => sum + value, 0)/monthlyGeneration.length}.toFixed(2).replace('.', ',')} kWh/mês
+                        Geração Estimada : {(monthlyGeneration.reduce((sum, value) => sum + value, 0)/monthlyGeneration.length).toFixed(2).replace('.', ',')} kWh/mês
                     </Text>
 
                     <Text style={{ marginBottom: 4 }}>
