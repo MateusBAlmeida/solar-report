@@ -644,6 +644,7 @@ export function SimulationResults({
                         descriptionPlacas={descriptionPlacas}
                         descriptionInversor={descriptionInversor}
                         inversor={inversor}
+                        averageGeneration={recalculatedGeneration}
                     />
 
                 </CardContent>

@@ -30,6 +30,7 @@ type Props = {
   descriptionPlacas: string
   descriptionInversor: string
   inversor: string
+  averageGeneration: number
   generateChartImage:
   () => Promise<string | undefined>
 }

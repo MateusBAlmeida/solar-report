@@ -35,6 +35,7 @@ type Props = {
     descriptionPlacas: string
     descriptionInversor: string
     inversor: string
+    averageGeneration: number
 }
 
 const styles = StyleSheet.create({
@@ -169,7 +170,8 @@ export function ReportDocument({
     annualSavings,
     descriptionPlacas,
     descriptionInversor,
-    inversor
+    inversor,
+    averageGeneration
 }: Props) {
 
     const yearlySavings =
@@ -500,7 +502,7 @@ export function ReportDocument({
                     </Text>
 
                     <Text style={{ marginBottom: 4 }}>
-                        Geração Estimada : {(calculateAverageGeneration(monthlyGeneration)).toFixed(2).replace('.', ',')} kWh/mês
+                        Geração Estimada : {averageGeneration.toFixed(2).replace('.', ',')} kWh/mês
                     </Text>
 
                     <Text style={{ marginBottom: 4 }}>
